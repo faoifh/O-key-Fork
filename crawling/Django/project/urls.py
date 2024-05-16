@@ -16,9 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from app.views import EconomyListView
+from app import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('Economy/', EconomyListView.as_view(), name='economy-list'),
+    path('news/', views.get_crawled_data, name='get_crawled_data'),
 ]
