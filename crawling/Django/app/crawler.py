@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 POLITICS = 100
 ECONOMY = 101
 
-def crawling(type, type_num) :
+def crawling(crawl_type, type_num) :
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
     
@@ -28,16 +28,16 @@ def crawling(type, type_num) :
         for letter in article_text: # 내용 따오기
             content = letter.text.strip()
     
-        # JSON 형식으로 데이터 변환
-        data = {
-            "type" : type,
-            "title": title, 
-            "content" : content
-        }
+        # 제목과 내용 배열에 삽입
+        data_bundle.append({"title": title, "content": content})
+
+    #JSON 형식으로 데이터 변환 및 타입 태그 추가
+    data = {
+        'crawl_type' : crawl_type,
+        'data' : data_bundle
+    }
         
-        data_bundle.append(data)
-        
-    return data_bundle
+    return data
 
 def selectCrawlType(crawl_type) :
     #type 에 따라 조건문 수행
@@ -47,6 +47,10 @@ def selectCrawlType(crawl_type) :
     elif crawl_type == 'politics':
         return crawling('politics', POLITICS)
         
-    #else :
-        #title = "no data"
-        #content = "no data"
+    else :
+        return {
+            'crawl_type' : crawl_type,
+            'title' : "no data",
+            'content' : "no data"
+        }
+        

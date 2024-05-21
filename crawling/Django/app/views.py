@@ -9,7 +9,7 @@ from . import crawler
 def get_crawled_data(request) :
     crawl_type = request.GET.get('crawl_type')
     
-    data = crawler.crawling(crawl_type)
+    data = crawler.selectCrawlType(crawl_type)
     headers = {"Content-Type": "application/json"}
 
     # JSON 응답 반환
