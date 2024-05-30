@@ -60,3 +60,23 @@ requests
 
 json
 
+### 언론사 목록
+
+해당 스크립트에서 크롤링하는 언론사의 목록입니다.
+
+
+경향신문 <https://www.khan.co.kr/>
+
+내일신문 <https://www.naeil.com/>
+
+동아일보 <https://www.donga.com/>
+
+문화일보 <https://www.munhwa.com/>
+
+서울신문 <https://www.seoul.co.kr/>
+
+서울일보 <https://www.seoulilbo.com/>
+
+아시아투데이 <https://www.asiatoday.co.kr/>
+
+중앙일보 <https://www.joongang.co.kr/>
