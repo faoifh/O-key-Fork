@@ -4,11 +4,11 @@ from bs4 import BeautifulSoup
 
 
 def crawling(crawl_type) :
-    #경향신문 O, 국민일보 X, 내일신문 O , 동아일보 O, 문화일보 O, 서울신문 O, 서울일보 O, 세계일보 X, 아시아투데이 O, 조선일보, 중앙일보 O , 한겨레 (크롤링 허용 X), 한국일보 (크롤링 허용 X)
+    #경향신문 O, 내일신문 O , 동아일보 O, 문화일보 O, 서울신문 O, 서울일보 O, 세계일보 X (크롤링 허용 X), 
+    #아시아투데이 O, 조선일보, 중앙일보 O , 한겨레 (크롤링 허용 X), 한국일보 (크롤링 허용 X)
     data_bundle = crawl_khan(crawl_type) # 경향신문 크롤링
     data_bundle.extend(crawl_naeil(crawl_type)) #내일신문 크롤링
     data_bundle.extend(crawl_donga(crawl_type)) #동아일보 크롤링
-
     data_bundle.extend(crawl_munhwa(crawl_type)) # 문화일보 크롤링
     data_bundle.extend(crawl_seoulNews(crawl_type)) # 서울신문 크롤링
     data_bundle.extend(crawl_seoulIlbo(crawl_type)) # 서울일보 크롤링
@@ -25,7 +25,7 @@ def crawling(crawl_type) :
         'data' : data_bundle
     }
     
-    print(data)
+    #print(data)
         
     return data
 
@@ -51,7 +51,7 @@ def crawl_khan(crawl_type) : # 경향신문 크롤링, 경향 신문에는 사�
                'economy' : 'economy', 'society' : 'national', 'culture' : 'culture', 'science' : 'science', 'world' : 'world', 'sport' : 'sports'} # 타입에 따른 주소 태그의 딕셔너리
     
     if not (crawl_type in TYPETAG) :
-        return {}
+        return []
     
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
@@ -87,7 +87,7 @@ def crawl_naeil(crawl_type) : # 내일신문 크롤링
                'economy' : 'economy', 'society' : 'policy', 'science' : 'industry', 'world' : 'diplomacy'} # 타입에 따른 주소 태그의 딕셔너리
 
     if not (crawl_type in TYPETAG) :
-        return {}
+        return []
 
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
@@ -124,7 +124,7 @@ def crawl_donga(crawl_type) : # 동아일보 크롤링
                'enter' : 'Entertainment'} # 타입에 따른 주소 태그의 딕셔너리
 
     if not (crawl_type in TYPETAG) :
-        return {}
+        return []
 
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
@@ -158,7 +158,7 @@ def crawl_joongang(crawl_type) : # 중앙일보 크롤링
                'economy' : 'money', 'society' : 'society', 'culture' : 'culture', 'world' : 'world', 'sport' : 'sports'} # 타입에 따른 주소 태그의 딕셔너리
 
     if not (crawl_type in TYPETAG) :
-        return {}
+        return []
 
     header = {'User-agent' : 'Mozila/2.0'}  
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
@@ -195,7 +195,7 @@ def crawl_munhwa(crawl_type) : # 문화일보 크롤링
                'sport' : 'sports', 'enter' : 'ent', 'people':'people'} # 타입에 따른 주소 태그의 딕셔너리
 
     if not (crawl_type in TYPETAG) :
-        return {}
+        return []
 
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
@@ -230,7 +230,7 @@ def crawl_seoulNews(crawl_type) : # 서울신문 크롤링
                 'people' : 'peoples'} # 타입에 따른 주소 태그의 딕셔너리
 
     if not (crawl_type in TYPETAG) :
-        return {}
+        return []
 
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
@@ -269,7 +269,7 @@ def crawl_seoulIlbo(crawl_type) : # 서울일보 크롤링
                 'education' : '20'} # 타입에 따른 주소 태그의 딕셔너리
 
     if not (crawl_type in TYPETAG) :
-        return {}
+        return []
 
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
@@ -309,7 +309,7 @@ def crawl_segye(crawl_type) : # 세계일보 크롤링
                 'enter' : 'entertainment'} # 타입에 따른 주소 태그의 딕셔너리
 
     if not (crawl_type in TYPETAG) :
-        return {}
+        return []
 
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
@@ -348,8 +348,11 @@ def crawl_asia(crawl_type) : # 아시아투데이 크롤링
                 'society' : '3', 'economy' : '4', 'world' : '6', 'culture' : '7&d2=5', 'sport' : '7&d2=7',
                 'enter' : '7&d2=2'} # 타입에 따른 주소 태그의 딕셔너리
 
+    SPECIALTAG = ['sport', 'enter', 'culture']
+
+
     if not (crawl_type in TYPETAG) :
-        return {}
+        return []
 
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
@@ -368,7 +371,11 @@ def crawl_asia(crawl_type) : # 아시아투데이 크롤링
         subSoup = BeautifulSoup(html, 'html.parser')
         article_text = subSoup.select('.news_bm')
 
-        title = link.find('h4')
+        
+        if(crawl_type in SPECIALTAG) :
+            title = link.find('h5')
+        else :
+            title = link.find('h4')
         title = title.text.strip()
 
         for letter in article_text: # 내용 따오기
@@ -446,5 +453,3 @@ def crawl_daum(crawl_type) : # 다음 뉴스 크롤링
         data_bundle.append({"title": title, "content": content})
 
     return data_bundle
-
-crawling('politics')
