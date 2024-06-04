@@ -19,11 +19,23 @@
 git checkout faoifh
 ```
 
+### 의존성
+
+스크립트 실행을 위하여 다음 라이브러리를 설치해야 합니다.
+
+```
+pip3 install BeautifulSoup4
+pip3 install requests
+pip3 install django
+pip3 install djangorestframwork
+```
+
 ### 사용법
 
-1. Crawling 폴더의 RunDjango.bat 파일을 실행
-2. <http://127.0.0.1:8000/news/?crawl_type=type> 로 접속
-3. url의 마지막 'type'을 원하는 원하는 타입으로 수정
+1. `cd crawling/Django` 명령을 사용하여 Django 폴더로 이동
+2. `python manage.py runserver` 명령 실행
+3. <http://127.0.0.1:8000/news/?crawl_type=type> 로 접속
+4. url의 마지막 'type'을 원하는 원하는 타입으로 수정
 
 #### 사용 가능한 타입
 
@@ -50,15 +62,7 @@ git checkout faoifh
 해당 type들은 crawler.selectCrawlType 메소드의 CRAWL_TYPES 리스트에 작성되어 있습니다.
 
 ---
-### 의존성
 
-스크립트 실행을 위하여 다음이 필요합니다.
-
-BeautifulSoup4
-
-requests
-
-json
 
 ### 언론사 목록
 
