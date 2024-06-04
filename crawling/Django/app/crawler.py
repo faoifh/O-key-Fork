@@ -1,23 +1,46 @@
 import requests
 import json
+import threading
 from bs4 import BeautifulSoup
 
 
 def crawling(crawl_type) :
     #경향신문 O, 내일신문 O , 동아일보 O, 문화일보 O, 서울신문 O, 서울일보 O, 세계일보 X (크롤링 허용 X), 
     #아시아투데이 O, 조선일보, 중앙일보 O , 한겨레 (크롤링 허용 X), 한국일보 (크롤링 허용 X)
-    data_bundle = crawl_khan(crawl_type) # 경향신문 크롤링
-    data_bundle.extend(crawl_naeil(crawl_type)) #내일신문 크롤링
-    data_bundle.extend(crawl_donga(crawl_type)) #동아일보 크롤링
-    data_bundle.extend(crawl_munhwa(crawl_type)) # 문화일보 크롤링
-    data_bundle.extend(crawl_seoulNews(crawl_type)) # 서울신문 크롤링
-    data_bundle.extend(crawl_seoulIlbo(crawl_type)) # 서울일보 크롤링
-    #data_bundle.extend(crawl_segye(crawl_type)) # 세계일보 크롤링(미구현)
-    data_bundle.extend(crawl_asia(crawl_type)) # 아시아투데이 크롤링
 
-    data_bundle.extend(crawl_joongang(crawl_type)) #중앙일보 크롤링
+    data_bundle = []
+
+    #각 크롤링 함수들을 쓰레드에 지정
+    t1 = threading.Thread(target = crawl_khan, args=(crawl_type, data_bundle))#경향신문
+    t2 = threading.Thread(target = crawl_naeil, args=(crawl_type, data_bundle))#내일신문
+    t3 = threading.Thread(target = crawl_donga, args=(crawl_type, data_bundle))#동아일보
+    t4 = threading.Thread(target = crawl_munhwa, args=(crawl_type, data_bundle))#문화일보
+    t5 = threading.Thread(target = crawl_seoulNews, args=(crawl_type, data_bundle))#서울신문
+    t6 = threading.Thread(target = crawl_seoulIlbo, args=(crawl_type, data_bundle))#서울일보
+    t7 = threading.Thread(target = crawl_asia, args=(crawl_type, data_bundle))#아시아투데이
+    t8 = threading.Thread(target = crawl_joongang, args=(crawl_type, data_bundle))#중앙일보
     
 
+    #쓰레드를 통해 크롤링을 동시에 실시
+    t1.start()
+    t2.start()
+    t3.start()
+    t4.start()
+    t5.start()
+    t6.start()
+    t7.start()
+    t8.start()
+
+
+    #모든 쓰레드가 종료될 때 까지 대기
+    t1.join()
+    t2.join()
+    t3.join()
+    t4.join()
+    t5.join()
+    t6.join()
+    t7.join()
+    t8.join()
     
     #JSON 형식으로 데이터 변환 및 타입 태그 추가
     data = {
@@ -46,12 +69,12 @@ def selectCrawlType(crawl_type) :
 
     
 
-def crawl_khan(crawl_type) : # 경향신문 크롤링, 경향 신문에는 사진과 제목만 존재하고 본문이 없는 경우도 있음. 현제 1페이지만 크롤링 가능. 기능 추가 필요함
+def crawl_khan(crawl_type, return_data) : # 경향신문 크롤링, 경향 신문에는 사진과 제목만 존재하고 본문이 없는 경우도 있음. 현제 1페이지만 크롤링 가능. 기능 추가 필요함
     TYPETAG = {'politics' : 'politics', 
                'economy' : 'economy', 'society' : 'national', 'culture' : 'culture', 'science' : 'science', 'world' : 'world', 'sport' : 'sports'} # 타입에 따른 주소 태그의 딕셔너리
     
     if not (crawl_type in TYPETAG) :
-        return []
+        return
     
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
@@ -80,14 +103,14 @@ def crawl_khan(crawl_type) : # 경향신문 크롤링, 경향 신문에는 사�
         # 제목과 내용 배열에 삽입
         data_bundle.append({"title": title, "content": content})
 
-    return data_bundle
+    return_data.extend(data_bundle)
 
-def crawl_naeil(crawl_type) : # 내일신문 크롤링
+def crawl_naeil(crawl_type, return_data) : # 내일신문 크롤링
     TYPETAG = {'politics' : 'politics',
                'economy' : 'economy', 'society' : 'policy', 'science' : 'industry', 'world' : 'diplomacy'} # 타입에 따른 주소 태그의 딕셔너리
 
     if not (crawl_type in TYPETAG) :
-        return []
+        return
 
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
@@ -116,15 +139,15 @@ def crawl_naeil(crawl_type) : # 내일신문 크롤링
         # 제목과 내용 배열에 삽입
         data_bundle.append({"title": title, "content": content})
 
-    return data_bundle
+    return_data.extend(data_bundle)
 
-def crawl_donga(crawl_type) : # 동아일보 크롤링
+def crawl_donga(crawl_type, return_data) : # 동아일보 크롤링
     TYPETAG = {'politics' : 'Politics',
                'economy' : 'Economy', 'society' : 'Society', 'culture' : 'Culture', 'world' : 'Inter', 'sport' : 'Sports',
                'enter' : 'Entertainment'} # 타입에 따른 주소 태그의 딕셔너리
 
     if not (crawl_type in TYPETAG) :
-        return []
+        return
 
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
@@ -151,14 +174,14 @@ def crawl_donga(crawl_type) : # 동아일보 크롤링
         # 제목과 내용 배열에 삽입
         data_bundle.append({"title": title, "content": content})
 
-    return data_bundle
+    return_data.extend(data_bundle)
 
-def crawl_joongang(crawl_type) : # 중앙일보 크롤링
+def crawl_joongang(crawl_type, return_data) : # 중앙일보 크롤링
     TYPETAG = {'politics' : 'politics', 
                'economy' : 'money', 'society' : 'society', 'culture' : 'culture', 'world' : 'world', 'sport' : 'sports'} # 타입에 따른 주소 태그의 딕셔너리
 
     if not (crawl_type in TYPETAG) :
-        return []
+        return
 
     header = {'User-agent' : 'Mozila/2.0'}  
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
@@ -187,15 +210,15 @@ def crawl_joongang(crawl_type) : # 중앙일보 크롤링
 
     #print(data_bundle)
 
-    return data_bundle
+    return_data.extend(data_bundle)
 
-def crawl_munhwa(crawl_type) : # 문화일보 크롤링
+def crawl_munhwa(crawl_type, return_data) : # 문화일보 크롤링
     TYPETAG = {'politics' : 'politics',
                'economy' : 'economy', 'society' : 'society', 'culture' : 'culture', 'world' : 'international',
                'sport' : 'sports', 'enter' : 'ent', 'people':'people'} # 타입에 따른 주소 태그의 딕셔너리
 
     if not (crawl_type in TYPETAG) :
-        return []
+        return
 
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
@@ -222,15 +245,15 @@ def crawl_munhwa(crawl_type) : # 문화일보 크롤링
         # 제목과 내용 배열에 삽입
         data_bundle.append({"title": title, "content": content})
 
-    return data_bundle
+    return_data.extend(data_bundle)
 
-def crawl_seoulNews(crawl_type) : # 서울신문 크롤링
+def crawl_seoulNews(crawl_type, return_data) : # 서울신문 크롤링
     TYPETAG = {'politics' : 'politics',
                 'economy' : 'economy', 'society' : 'society', 'culture' : 'life', 'world' : 'international', 'sport' : 'sport',
                 'people' : 'peoples'} # 타입에 따른 주소 태그의 딕셔너리
 
     if not (crawl_type in TYPETAG) :
-        return []
+        return
 
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
@@ -261,15 +284,15 @@ def crawl_seoulNews(crawl_type) : # 서울신문 크롤링
         # 제목과 내용 배열에 삽입
         data_bundle.append({"title": title, "content": content})
 
-    return data_bundle
+    return_data.extend(data_bundle)
 
-def crawl_seoulIlbo(crawl_type) : # 서울일보 크롤링
+def crawl_seoulIlbo(crawl_type, return_data) : # 서울일보 크롤링
     TYPETAG = {'politics' : '8',
                 'economy' : '9', 'society' : '10', 'culture' : '11', 'enter' : '12', 'world' : '14',
                 'education' : '20'} # 타입에 따른 주소 태그의 딕셔너리
 
     if not (crawl_type in TYPETAG) :
-        return []
+        return
 
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
@@ -299,7 +322,7 @@ def crawl_seoulIlbo(crawl_type) : # 서울일보 크롤링
         # 제목과 내용 배열에 삽입
         data_bundle.append({"title": title, "content": content})
 
-    return data_bundle
+    return_data.extend(data_bundle)
 
 '''
 # newsBox.select() 에서 오류
@@ -309,7 +332,7 @@ def crawl_segye(crawl_type) : # 세계일보 크롤링
                 'enter' : 'entertainment'} # 타입에 따른 주소 태그의 딕셔너리
 
     if not (crawl_type in TYPETAG) :
-        return []
+        return
 
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
@@ -340,10 +363,10 @@ def crawl_segye(crawl_type) : # 세계일보 크롤링
         # 제목과 내용 배열에 삽입
         data_bundle.append({"title": title, "content": content})
 
-    return data_bundle
+    return_data.extend(data_bundle)
 '''
 
-def crawl_asia(crawl_type) : # 아시아투데이 크롤링
+def crawl_asia(crawl_type, return_data) : # 아시아투데이 크롤링
     TYPETAG = {'politics' : '2',
                 'society' : '3', 'economy' : '4', 'world' : '6', 'culture' : '7&d2=5', 'sport' : '7&d2=7',
                 'enter' : '7&d2=2'} # 타입에 따른 주소 태그의 딕셔너리
@@ -352,7 +375,7 @@ def crawl_asia(crawl_type) : # 아시아투데이 크롤링
 
 
     if not (crawl_type in TYPETAG) :
-        return []
+        return
 
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
@@ -385,11 +408,11 @@ def crawl_asia(crawl_type) : # 아시아투데이 크롤링
         # 제목과 내용 배열에 삽입
         data_bundle.append({"title": title, "content": content})
 
-    return data_bundle
+    return_data.extend(data_bundle)
 
 #Not in use
 
-def crawl_naver(crawl_type) : # 네이버 뉴스 크롤링
+def crawl_naver(crawl_type, return_data) : # 네이버 뉴스 크롤링
     TYPETAG = {'politics' : 100, 
                'economy' : 101, 'society' : 102, 'culture' : 103, 'science' : 105, 'world' : 104} # 타입에 따른 주소 태그의 딕셔너리
 
@@ -418,9 +441,9 @@ def crawl_naver(crawl_type) : # 네이버 뉴스 크롤링
         # 제목과 내용 배열에 삽입
         data_bundle.append({"title": title, "content": content})
 
-    return data_bundle
+    return_data.extend(data_bundle)
 
-def crawl_daum(crawl_type) : # 다음 뉴스 크롤링
+def crawl_daum(crawl_type, return_data) : # 다음 뉴스 크롤링
     TYPETAG = {'politics' : 'politics', 
                'economy' : 'economic', 'society' : 'society', 'culture' : 'culture', 'science' : 'digital', 'world' : 'foreign'} # 타입에 따른 주소 태그의 딕셔너리
     
@@ -452,4 +475,4 @@ def crawl_daum(crawl_type) : # 다음 뉴스 크롤링
         # 제목과 내용 배열에 삽입
         data_bundle.append({"title": title, "content": content})
 
-    return data_bundle
+    return_data.extend(data_bundle)
