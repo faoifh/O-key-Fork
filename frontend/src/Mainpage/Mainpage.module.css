@@ -61,6 +61,7 @@ body {
   display: flex;
   align-items: center;
   padding: 0 10px;
+  
 }
 
 .dropdown {
@@ -96,6 +97,7 @@ body {
   font-style: normal;
   font-weight: 700;
   line-height: normal;
+  cursor: pointer;
 }
 
 .content {
@@ -133,7 +135,7 @@ body {
 }
 
 .news_count {
-  color: #0066ff;
+  color: #006CFF;
   font-size: 20px;
 }
 

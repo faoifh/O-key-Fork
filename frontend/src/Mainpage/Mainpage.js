@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styles from './Mainpage.module.css'; // CSS 모듈을 가져옵니다.
+import Modal from '../Login/Modal.js';
 
 const words = [
     // 추가 단어들...
@@ -8,6 +9,7 @@ const words = [
 export default function Mainpage() {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState('전체');
+    const [modal, setModal] = useState(false);
 
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
@@ -15,6 +17,15 @@ export default function Mainpage() {
 
     const handleCategoryClick = (category) => {
         setSelectedCategory(category);
+    };
+
+    const showModal = () => {
+        console.log("showModal called");
+        setModal(true);
+    };
+
+    const hideModal = () => {
+        setModal(false);
     };
 
     return (
@@ -39,7 +50,7 @@ export default function Mainpage() {
                     )}
                 </div>
                 <div className={`${styles.login}`}>
-                    <button className={`${styles.loginbtn}`}>로그인</button>
+                    <button onClick={showModal} className={`${styles.loginbtn}`}>로그인</button>
                 </div>
             </div>
             <div className={`${styles.content}`}>
@@ -81,6 +92,7 @@ export default function Mainpage() {
                     </div>
                 </div>
             </div>
+            {modal && <Modal onClose={hideModal} />}
         </div>
     );
 }
