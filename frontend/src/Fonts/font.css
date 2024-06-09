@@ -1,0 +1,27 @@
+@font-face {
+    font-family: 'GmarketSansMedium';
+    src: url("./fonts/GMARKETSANSTTFMEDIUM.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'GmarketSansLight';
+    src: url("./fonts/GMARKETSANSTTFLIGHT.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'GmarketSansBold';
+    src: url("./fonts/GMARKETSANSTTFBOLD.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Lemon';
+    src: url("./fonts/LEMON-REGULAR.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
