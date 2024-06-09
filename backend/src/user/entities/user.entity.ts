@@ -1,7 +1,7 @@
 import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
 
 @Entity({ schema: "okey", name: "user" })
-export class RegisterEntity {
+export class UserEntity {
     @PrimaryGeneratedColumn()
     count: number
 
