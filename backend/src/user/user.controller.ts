@@ -9,29 +9,29 @@ export class UserController {
 
    constructor(
       private readonly userService: UserService,
-      private readonly authService: AuthService
    ) {
    }
 
    @Post("/register")
-   register(@Body() userInfo: RegisterDto) {
+   async register(@Body() userInfo: RegisterDto) {
+      console.log(userInfo)
       return this.userService.register(userInfo)
    }
 
    @Post("/login")
    async login(@Request() req: any, @Res({ passthrough: true }) res: any) {
-      const { accessToken, refreshToken } = await this.authService.login(req.user)
+      const loginResult = await this.userService.login(req.user)
 
-      res.setHeader("Authorization", "Bearer " + accessToken)
+      res.setHeader("Authorization", "Bearer " + loginResult.accessToken)
 
-      res.cookie("refreshToken", refreshToken, {
+      res.cookie("refreshToken", loginResult.refreshToken, {
          httpOnly: true,
          secure: true
          // maxAge: 24 * 60 * 60 * 1000
       })
 
       return {
-         "message": `${req.user.name} login successful!`
+         "message": `${loginResult.name} login successful!`
       }
    }
 }

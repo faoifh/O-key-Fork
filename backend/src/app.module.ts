@@ -4,7 +4,7 @@ import * as process from "process"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { UserModule } from './user/user.module';
 import { UserEntity } from "@src/user/entities/user.entity"
-import { AuthModule } from './auth/auth.module';
+import { CheckTokenModule } from './check-token/check-token.module';
 
 @Module({
   imports: [
@@ -23,7 +23,7 @@ import { AuthModule } from './auth/auth.module';
       synchronize: false,
     }),
     UserModule,
-    AuthModule,
+    CheckTokenModule,
   ],
   controllers: [],
   providers: []

@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common"
+import { Injectable, UnauthorizedException } from "@nestjs/common"
 import { RegisterDto } from "@src/user/dto/register.dto"
 import { InjectRepository } from "@nestjs/typeorm"
 import { UserEntity } from "@src/user/entities/user.entity"
@@ -44,23 +44,21 @@ export class UserService {
       const checkUserResult = await this.checkExistUser(userInfo.id)
 
       if (checkUserResult.hasOwnProperty("error")) {
-         return checkUserResult.error
+         throw new UnauthorizedException(checkUserResult.error)
       }
 
       // 비밀번호 유효성 확인
       const checkPassword = await this.validatePassword(userInfo.password, checkUserResult.password)
 
       if (!checkPassword) {
-         return {
-            "error": "User not found"
-         }
+         throw new UnauthorizedException("User not found")
       }
 
       // 모든 조건 통과
       // token 발급
-      return await this.authService.login({
+      return await this.authService.generateToken({
          "id": checkUserResult.id,
-         "name": checkUserResult.name,
+         "name": checkUserResult.name
       })
    }
 

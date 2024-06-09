@@ -5,7 +5,7 @@ import { ValidationPipe } from "@nestjs/common"
 
 async function bootstrap() {
     const envFile =
-        process.env.npm_lifecycle_event === "start:dev" ? "http://localhost:5173" : "https://av0code.anhye0n.com"
+        process.env.npm_lifecycle_event === "start:dev" ? "http://localhost:3000" : "https://okey.anhye0n.com"
 
     const app = await NestFactory.create(AppModule)
 

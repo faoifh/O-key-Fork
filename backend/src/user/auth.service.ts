@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common"
 import { JwtService } from "@nestjs/jwt"
-import { jwtConstants } from "@src/user/constants"
+import { jwtConstants } from "@src/constants"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { UserEntity } from "@src/user/entities/user.entity"
@@ -33,7 +33,7 @@ export class AuthService {
       })
    }
 
-   async login(userInfo: {
+   async generateToken(userInfo: {
       id: string
       name: string,
    }) {
