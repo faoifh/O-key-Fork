@@ -16,4 +16,7 @@ export class UserEntity {
 
     @Column()
     interests: string
+
+    @Column()
+    refresh_token: string
 }
