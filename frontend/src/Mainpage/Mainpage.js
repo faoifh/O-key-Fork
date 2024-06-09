@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styles from './Mainpage.module.css'; // CSS 모듈을 가져옵니다.
 import Modal from '../Login/Modal.js';
+import SignUpmodal from '../SignUp/SignUpmodal.js';
 
 const words = [
     // 추가 단어들...
@@ -9,7 +10,8 @@ const words = [
 export default function Mainpage() {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState('전체');
-    const [modal, setModal] = useState(false);
+    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+    const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
 
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
@@ -19,13 +21,19 @@ export default function Mainpage() {
         setSelectedCategory(category);
     };
 
-    const showModal = () => {
-        console.log("showModal called");
-        setModal(true);
+    const showLoginModal = () => {
+        setIsLoginModalOpen(true);
+        setIsSignUpModalOpen(false);
     };
 
-    const hideModal = () => {
-        setModal(false);
+    const showSignUpModal = () => {
+        setIsSignUpModalOpen(true);
+        setIsLoginModalOpen(false);
+    };
+
+    const hideModals = () => {
+        setIsLoginModalOpen(false);
+        setIsSignUpModalOpen(false);
     };
 
     return (
@@ -50,7 +58,7 @@ export default function Mainpage() {
                     )}
                 </div>
                 <div className={`${styles.login}`}>
-                    <button onClick={showModal} className={`${styles.loginbtn}`}>로그인</button>
+                    <button onClick={showLoginModal} className={`${styles.loginbtn}`}>로그인</button>
                 </div>
             </div>
             <div className={`${styles.content}`}>
@@ -92,7 +100,8 @@ export default function Mainpage() {
                     </div>
                 </div>
             </div>
-            {modal && <Modal onClose={hideModal} />}
+            {isLoginModalOpen && <Modal onClose={hideModals} onSignUpClick={showSignUpModal} />}
+            {isSignUpModalOpen && <SignUpmodal onClose={hideModals} />}
         </div>
     );
 }
