@@ -7,6 +7,7 @@ import {useNavigate} from "react-router-dom";
 import requestApi from "../plugins/api-setting";
 import {setAccessToken, setUserName} from "../store/user-slice";
 import {post} from "axios";
+import {getCurrentDateTime} from "../plugins/date";
 
 const words = [
     // 추가 단어들...
@@ -92,7 +93,7 @@ export default function Mainpage() {
                         ?
                         <>
                             <p>{reduxInfo.userName}</p>
-                            <button onClick={logout} className={`${styles.loginbtn}`}>로그아웃</button>
+                            <p onClick={logout} className={`${styles.logoutbtn}`}>로그아웃</p>
                         </>
                         :
                         <button onClick={showLoginModal} className={`${styles.loginbtn}`}>로그인</button>
@@ -106,7 +107,7 @@ export default function Mainpage() {
                 </div>
                 <div className={`${styles.keywordbox}`}></div>
                 <p>분석 대상 뉴스 <span className={`${styles.news_count}`}> 8,360</span>건</p>
-                <div className={`${styles.date}`}>2024. 05. 13 (월) 18:00 기준</div>
+                <div className={`${styles.date}`}>{getCurrentDateTime()}</div>
                 <div className={`${styles.categories_wrapper}`}>
                     <div className={`${styles.categories}`}>
                         {[

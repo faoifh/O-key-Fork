@@ -2,10 +2,13 @@ import React, {useState} from 'react';
 import styles from './SignUpmodal.module.css';
 
 import requestApi from "../plugins/api-setting";
-import {isValidEmail} from "../plugins/validators";
+import {isEmpty, isValidEmail} from "../plugins/validators";
 import {useNavigate} from "react-router-dom";
+import {setAccessToken, setUserName} from "../store/user-slice";
+import {useDispatch, useSelector} from "react-redux";
 
 function SignUpmodal({onClose}) {
+
     const navigate = useNavigate()
 
     const [keywords, setKeywords] = useState([
@@ -35,6 +38,11 @@ function SignUpmodal({onClose}) {
 
     // 회원가입
     const signUp = () => {
+        if (isEmpty(signUpInfo.id) || isEmpty(signUpInfo.name) || isEmpty(signUpInfo.password)) {
+            alert("값을 입력해주시길 바랍니다.")
+            return
+        }
+
         if (!isValidEmail(signUpInfo.id)) {
             alert("이메일 형식이 맞지 않습니다.")
             return
@@ -68,23 +76,38 @@ function SignUpmodal({onClose}) {
                 <div className={styles.modalinputWrap}>
                     <div className={styles.inputname}>
                         <p>NAME</p>
-                        <input className={styles.input_info}
-                               placeholder="이름을 입력하세요."
-                               value={signUpInfo.name}
-                               onChange={e => setSignUpInfo({
-                                   ...signUpInfo,
-                                   name: e.target.value
-                               })}
+                        <input
+                            type="text"
+                            className={styles.input_info}
+                            placeholder="이름을 입력하세요."
+                            value={signUpInfo.name}
+                            onChange={e => setSignUpInfo({
+                                ...signUpInfo,
+                                name: e.target.value
+                            })}
+                            onKeyDown={e => {
+                                if (e.key === 'Enter') {
+                                    signUp()
+                                }
+                            }}
                         />
                     </div>
                     <div className={styles.inputemail}>
                         <p>E-mail</p>
-                        <input className={styles.input_info} placeholder="사용할 이메일을 입력하세요."
-                               value={signUpInfo.id}
-                               onChange={e => setSignUpInfo({
-                                   ...signUpInfo,
-                                   id: e.target.value
-                               })}/>
+                        <input
+                            type="email"
+                            className={styles.input_info} placeholder="사용할 이메일을 입력하세요."
+                            value={signUpInfo.id}
+                            onChange={e => setSignUpInfo({
+                                ...signUpInfo,
+                                id: e.target.value
+                            })}
+                            onKeyDown={e => {
+                                if (e.key === 'Enter') {
+                                    signUp()
+                                }
+                            }}
+                        />
                     </div>
                     <div className={styles.inputpw}>
                         <p>Password</p>
@@ -95,7 +118,13 @@ function SignUpmodal({onClose}) {
                             onChange={e => setSignUpInfo({
                                 ...signUpInfo,
                                 password: e.target.value
-                            })}/>
+                            })}
+                            onKeyDown={e => {
+                                if (e.key === 'Enter') {
+                                    signUp()
+                                }
+                            }}
+                        />
                     </div>
                 </div>
                 <div className={styles.checkboxWrap}>
@@ -108,6 +137,11 @@ function SignUpmodal({onClose}) {
                                         type="checkbox"
                                         checked={keyword.checked}
                                         onChange={() => handleCheckboxChange(keyword.id)}
+                                        onKeyDown={e => {
+                                            if (e.key === 'Enter') {
+                                                signUp()
+                                            }
+                                        }}
                                     />
                                     {keyword.text}
                                 </label>

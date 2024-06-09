@@ -4,6 +4,7 @@ import requestApi from "../plugins/api-setting";
 import {useDispatch} from "react-redux";
 import {useNavigate} from "react-router-dom";
 import {setAccessToken, setUserName} from "../store/user-slice";
+import {isEmpty, isValidEmail} from "../plugins/validators";
 
 function Modal({onClose, onSignUpClick}) {
 
@@ -15,8 +16,18 @@ function Modal({onClose, onSignUpClick}) {
 
     const navigate = useNavigate()
 
-
     const login = () => {
+        if (isEmpty(loginInfo.id) || isEmpty(loginInfo.password)) {
+            alert("값을 입력해주시길 바랍니다.")
+            return
+        }
+
+
+        if (!isValidEmail(loginInfo.id)) {
+            alert("이메일 형식이 맞지 않습니다.");
+            return
+        }
+
         requestApi.post("/user/login", {
             id: loginInfo.id,
             password: loginInfo.password,
@@ -43,11 +54,20 @@ function Modal({onClose, onSignUpClick}) {
                 <div className={styles.modalinputWrap}>
                     <div className={styles.inputemail}>
                         <p>E-mail</p>
-                        <input className={styles.input_info} placeholder="이메일을 입력하세요." value={loginInfo.id}
-                               onChange={e => setLoginInfo({
-                                   ...loginInfo,
-                                   id: e.target.value
-                               })}/>
+                        <input
+                            type="email"
+                            className={styles.input_info}
+                            placeholder="이메일을 입력하세요." value={loginInfo.id}
+                            onChange={e => setLoginInfo({
+                                ...loginInfo,
+                                id: e.target.value
+                            })}
+                            onKeyDown={e => {
+                                if (e.key === 'Enter') {
+                                    login()
+                                }
+                            }}
+                        />
                     </div>
                     <div className={styles.inputpw}>
                         <p>Password</p>
@@ -58,6 +78,11 @@ function Modal({onClose, onSignUpClick}) {
                                 ...loginInfo,
                                 password: e.target.value
                             })}
+                            onKeyDown={e => {
+                                if (e.key === 'Enter') {
+                                    login()
+                                }
+                            }}
                         />
                     </div>
                 </div>
