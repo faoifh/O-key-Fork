@@ -5,8 +5,6 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { UserEntity } from "@src/user/entities/user.entity"
 
-import * as bcrypt from "bcrypt"
-
 @Injectable()
 export class AuthService {
    constructor(
@@ -19,7 +17,10 @@ export class AuthService {
       name: string
    }): Promise<string> {
       const payload = { name: user.name }
-      return this.jwtService.sign(payload)
+      return this.jwtService.sign(payload, {
+         secret: jwtConstants.ACCESS_TOKEN_SECRET,
+         expiresIn: "5m"
+      })
    }
 
    async generateRefreshToken(user: {

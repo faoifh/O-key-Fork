@@ -8,7 +8,7 @@ import { AuthService } from "@src/user/auth.service"
 export class UserController {
 
    constructor(
-      private readonly userService: UserService,
+      private readonly userService: UserService
    ) {
    }
 
@@ -19,8 +19,8 @@ export class UserController {
    }
 
    @Post("/login")
-   async login(@Request() req: any, @Res({ passthrough: true }) res: any) {
-      const loginResult = await this.userService.login(req.user)
+   async login(@Body() body: any, @Res({ passthrough: true }) res: any) {
+      const loginResult = await this.userService.login(body)
 
       res.setHeader("Authorization", "Bearer " + loginResult.accessToken)
 
@@ -30,8 +30,17 @@ export class UserController {
          // maxAge: 24 * 60 * 60 * 1000
       })
 
-      return {
-         "message": `${loginResult.name} login successful!`
-      }
+      return loginResult.name
+
+   }
+   @Post("/logout")
+   logout(@Res({ passthrough: true }) res: any):boolean {
+
+      res.clearCookie("refreshToken", {
+         httpOnly: true,
+         secure: true
+      })
+
+      return true
    }
 }
