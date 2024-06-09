@@ -27,7 +27,7 @@ git checkout faoifh
 pip3 install BeautifulSoup4
 pip3 install requests
 pip3 install django
-pip3 install djangorestframwork
+pip3 install djangorestframework
 ```
 
 ### 사용법
