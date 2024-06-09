@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import styles from './Mainpage.module.css'; // CSS 모듈을 가져옵니다.
 import Modal from '../Login/Modal.js';
 import SignUpmodal from '../SignUp/SignUpmodal.js';
+import {useDispatch, useSelector} from "react-redux";
+import {useNavigate} from "react-router-dom";
+import requestApi from "../plugins/api-setting";
+import {setAccessToken, setUserName} from "../store/user-slice";
+import {post} from "axios";
 
 const words = [
     // 추가 단어들...
@@ -36,14 +41,38 @@ export default function Mainpage() {
         setIsSignUpModalOpen(false);
     };
 
+
+    const reduxInfo = useSelector((state) => state.userInfo)
+    const dispatch = useDispatch()
+
+    const navigate = useNavigate()
+
+    const logout = () => {
+        requestApi.post(`/auth/logout`, {}).then((res) => {
+            if (res.status === 201 && res.data === "Success Logout") {
+
+                // refreshToken 초기화는 DB에서
+                // accessToken 초기화
+                dispatch(setAccessToken(""))
+
+                // userName 초기화
+                dispatch(setUserName(""))
+
+                navigate("/")
+            }
+
+        }).catch((err) => {
+            console.log(err)
+        })
+    }
     return (
         <div className={`${styles.app}`}>
             <div className={`${styles.navbar}`}>
                 <div className={`${styles.logo}`}>O-key</div>
                 <div className={`${styles.search_bar}`}>
-                    <input type="text" placeholder="검색어를 입력해주세요." />
+                    <input type="text" placeholder="검색어를 입력해주세요."/>
                     <button type="button">
-                        <img src="/img/icon-search.png" alt="Search" />
+                        <img src="/img/icon-search.png" alt="Search"/>
                     </button>
                 </div>
                 <div className={`${styles.dropdownwrapper}`}>
@@ -57,10 +86,16 @@ export default function Mainpage() {
                         </div>
                     )}
                 </div>
+
                 <div className={`${styles.login}`}>
-                    <button onClick={showLoginModal} className={`${styles.loginbtn}`}>로그인</button>
+                    {reduxInfo.userName
+                        ?
+                        <p>{reduxInfo.userName}</p>
+                        :
+                        <button onClick={showLoginModal} className={`${styles.loginbtn}`}>로그인</button>}
                 </div>
             </div>
+
             <div className={`${styles.content}`}>
                 <div className={`${styles.keyword_header}`}>
                     <h2>오늘의 키워드</h2>
@@ -71,22 +106,23 @@ export default function Mainpage() {
                 <div className={`${styles.categories_wrapper}`}>
                     <div className={`${styles.categories}`}>
                         {[
-                            { label: '전체', icon: 'icon-all.png' },
-                            { label: '정치', icon: 'icon-politics.png' },
-                            { label: '경제', icon: 'icon-economy.png' },
-                            { label: '사회', icon: 'icon-society.png' },
-                            { label: '문화', icon: 'icon-culture.png' },
-                            { label: '국제', icon: 'icon-international.png' },
-                            { label: '지역', icon: 'icon-local.png' },
-                            { label: '스포츠', icon: 'icon-sports.png' },
-                            { label: 'IT/과학', icon: 'icon-science.png' }
+                            {label: '전체', icon: 'icon-all.png'},
+                            {label: '정치', icon: 'icon-politics.png'},
+                            {label: '경제', icon: 'icon-economy.png'},
+                            {label: '사회', icon: 'icon-society.png'},
+                            {label: '문화', icon: 'icon-culture.png'},
+                            {label: '국제', icon: 'icon-international.png'},
+                            {label: '지역', icon: 'icon-local.png'},
+                            {label: '스포츠', icon: 'icon-sports.png'},
+                            {label: 'IT/과학', icon: 'icon-science.png'}
                         ].map((category) => (
                             <div
                                 key={category.label}
                                 className={`${styles.category} ${selectedCategory === category.label ? styles.selected : ''}`}
                                 onClick={() => handleCategoryClick(category.label)}
                             >
-                                <img src={`/img/${category.icon}`} alt={category.label} className={styles.categoryIcon} />
+                                <img src={`/img/${category.icon}`} alt={category.label}
+                                     className={styles.categoryIcon}/>
                                 <span>{category.label}</span>
                             </div>
                         ))}
@@ -100,8 +136,8 @@ export default function Mainpage() {
                     </div>
                 </div>
             </div>
-            {isLoginModalOpen && <Modal onClose={hideModals} onSignUpClick={showSignUpModal} />}
-            {isSignUpModalOpen && <SignUpmodal onClose={hideModals} />}
+            {isLoginModalOpen && <Modal onClose={hideModals} onSignUpClick={showSignUpModal}/>}
+            {isSignUpModalOpen && <SignUpmodal onClose={hideModals}/>}
         </div>
     );
 }

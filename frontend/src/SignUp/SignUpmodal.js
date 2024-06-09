@@ -2,8 +2,11 @@ import React, {useState} from 'react';
 import styles from './SignUpmodal.module.css';
 
 import requestApi from "../plugins/api-setting";
+import {isValidEmail} from "../plugins/validators";
+import {useNavigate} from "react-router-dom";
 
 function SignUpmodal({onClose}) {
+    const navigate = useNavigate()
 
     const [keywords, setKeywords] = useState([
         {id: 1, text: '정치', checked: false},
@@ -32,6 +35,11 @@ function SignUpmodal({onClose}) {
 
     // 회원가입
     const signUp = () => {
+        if (!isValidEmail(signUpInfo.id)) {
+            alert("이메일 형식이 맞지 않습니다.")
+            return
+        }
+
         requestApi.post("user/register", {
             id: signUpInfo.id,
             name: signUpInfo.name,
@@ -42,6 +50,9 @@ function SignUpmodal({onClose}) {
                 .toString()
         }).then(res => {
             console.log(res)
+            alert("회원가입이 완료되었습니다.")
+            navigate("/")
+
         }).catch(err => {
             console.log(err)
         })
@@ -77,12 +88,14 @@ function SignUpmodal({onClose}) {
                     </div>
                     <div className={styles.inputpw}>
                         <p>Password</p>
-                        <input className={styles.input_info} placeholder="사용할 비밀번호를 입력하세요."
-                               value={signUpInfo.password}
-                               onChange={e => setSignUpInfo({
-                                   ...signUpInfo,
-                                   password: e.target.value
-                               })}/>
+                        <input
+                            type="password"
+                            className={styles.input_info} placeholder="사용할 비밀번호를 입력하세요."
+                            value={signUpInfo.password}
+                            onChange={e => setSignUpInfo({
+                                ...signUpInfo,
+                                password: e.target.value
+                            })}/>
                     </div>
                 </div>
                 <div className={styles.checkboxWrap}>
