@@ -48,8 +48,8 @@ export default function Mainpage() {
     const navigate = useNavigate()
 
     const logout = () => {
-        requestApi.post(`/auth/logout`, {}).then((res) => {
-            if (res.status === 201 && res.data === "Success Logout") {
+        requestApi.post(`/user/logout`, {})
+            .then(res => {
 
                 // refreshToken 초기화는 DB에서
                 // accessToken 초기화
@@ -59,11 +59,11 @@ export default function Mainpage() {
                 dispatch(setUserName(""))
 
                 navigate("/")
-            }
 
-        }).catch((err) => {
-            console.log(err)
-        })
+            })
+            .catch(err => {
+                console.log(err)
+            })
     }
     return (
         <div className={`${styles.app}`}>
@@ -90,9 +90,13 @@ export default function Mainpage() {
                 <div className={`${styles.login}`}>
                     {reduxInfo.userName
                         ?
-                        <p>{reduxInfo.userName}</p>
+                        <>
+                            <p>{reduxInfo.userName}</p>
+                            <button onClick={logout} className={`${styles.loginbtn}`}>로그아웃</button>
+                        </>
                         :
-                        <button onClick={showLoginModal} className={`${styles.loginbtn}`}>로그인</button>}
+                        <button onClick={showLoginModal} className={`${styles.loginbtn}`}>로그인</button>
+                    }
                 </div>
             </div>
 
