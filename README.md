@@ -33,9 +33,11 @@ pip3 install djangorestframework
 ### 사용법
 
 1. `cd crawling/Django` 명령을 사용하여 Django 폴더로 이동
-2. `python manage.py runserver` 명령 실행
+2. `python manage.py runserver` 명령 실행 
 3. <http://127.0.0.1:8000/news/?crawl_type=type> 로 접속
 4. url의 마지막 'type'을 원하는 원하는 타입으로 수정
+
+- 서버에서 실행하는 경우, `python3 manage.py runserver 0.0.0.0:8000` 명령을 통해 실행
 
 #### 사용 가능한 타입
 
