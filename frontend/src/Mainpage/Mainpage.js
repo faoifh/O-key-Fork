@@ -8,28 +8,19 @@ import requestApi from "../plugins/api-setting";
 import {setAccessToken, setUserName} from "../store/user-slice";
 import {post} from "axios";
 import {getCurrentDateTime} from "../plugins/date";
+import Menubar from "../components/menubar";
 
 const words = [
     // 추가 단어들...
 ];
 
 export default function Mainpage() {
-    const [isOpen, setIsOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState('전체');
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
 
-    const toggleDropdown = () => {
-        setIsOpen(!isOpen);
-    };
-
     const handleCategoryClick = (category) => {
         setSelectedCategory(category);
-    };
-
-    const showLoginModal = () => {
-        setIsLoginModalOpen(true);
-        setIsSignUpModalOpen(false);
     };
 
     const showSignUpModal = () => {
@@ -41,7 +32,6 @@ export default function Mainpage() {
         setIsLoginModalOpen(false);
         setIsSignUpModalOpen(false);
     };
-
 
     const reduxInfo = useSelector((state) => state.userInfo)
     const dispatch = useDispatch()
@@ -68,39 +58,7 @@ export default function Mainpage() {
     }
     return (
         <div className={`${styles.app}`}>
-            <div className={`${styles.navbar}`}>
-                <div className={`${styles.logo}`}>O-key</div>
-                <div className={`${styles.search_bar}`}>
-                    <input type="text" placeholder="검색어를 입력해주세요."/>
-                    <button type="button">
-                        <img src="/img/icon-search.png" alt="Search"/>
-                    </button>
-                </div>
-                <div className={`${styles.dropdownwrapper}`}>
-                    <button className={`${styles.dropdown}`} onClick={toggleDropdown}>6. 토트넘 vs...
-                    </button>
-                    {isOpen && (
-                        <div className={styles.dropdownContent}>
-                            <p>콘텐츠 1</p>
-                            <p>콘텐츠 2</p>
-                            <p>콘텐츠 3</p>
-                        </div>
-                    )}
-                </div>
-
-                <div className={`${styles.login}`}>
-                    {reduxInfo.userName
-                        ?
-                        <>
-                            <p>{reduxInfo.userName}</p>
-                            <p onClick={logout} className={`${styles.logoutbtn}`}>로그아웃</p>
-                        </>
-                        :
-                        <button onClick={showLoginModal} className={`${styles.loginbtn}`}>로그인</button>
-                    }
-                </div>
-            </div>
-
+            <Menubar setIsSignUpModalOpen={setIsSignUpModalOpen} setIsLoginModalOpen={setIsLoginModalOpen} />
             <div className={`${styles.content}`}>
                 <div className={`${styles.keyword_header}`}>
                     <h2>오늘의 키워드</h2>

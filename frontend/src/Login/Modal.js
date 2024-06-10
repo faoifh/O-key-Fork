@@ -3,7 +3,7 @@ import styles from './Modal.module.css';
 import requestApi from "../plugins/api-setting";
 import {useDispatch} from "react-redux";
 import {useNavigate} from "react-router-dom";
-import {setAccessToken, setUserName} from "../store/user-slice";
+import {setAccessToken, setInterests, setUserName} from "../store/user-slice";
 import {isEmpty, isValidEmail} from "../plugins/validators";
 
 function Modal({onClose, onSignUpClick}) {
@@ -35,7 +35,8 @@ function Modal({onClose, onSignUpClick}) {
             console.log(res)
 
             dispatch(setAccessToken(res.headers["authorization"].replace("Bearer ", "")))
-            dispatch(setUserName(res.data))
+            dispatch(setUserName(res.data.name))
+            dispatch(setInterests(res.data.interests))
 
             onClose();
             navigate("/")

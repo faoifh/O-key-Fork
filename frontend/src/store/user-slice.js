@@ -4,7 +4,8 @@ const userInfo = createSlice({
     name: "userInfo",
     initialState: {
         userName: "",
-        accessToken: ""
+        accessToken: "",
+        interests: [],
     },
     reducers: {
         setUserName(state, {payload}) {
@@ -12,13 +13,17 @@ const userInfo = createSlice({
         },
         setAccessToken(state, {payload}) {
             state.accessToken = payload
+        },
+        setInterests(state, {payload}) {
+            state.interests = payload
         }
     }
 })
 
 export const {
     setUserName,
-    setAccessToken
+    setAccessToken,
+    setInterests
 } = userInfo.actions
 
 export default userInfo
