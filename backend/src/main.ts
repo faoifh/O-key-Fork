@@ -5,7 +5,7 @@ import { ValidationPipe } from "@nestjs/common"
 
 async function bootstrap() {
     const envFile =
-        process.env.npm_lifecycle_event === "start:dev" ? "http://localhost:3000" : "https://okey.anhye0n.com"
+        process.env.npm_lifecycle_event === "start:dev" ? "http://localhost:3000" : "https://o-key.anhye0n.com"
 
     const app = await NestFactory.create(AppModule)
 
@@ -26,7 +26,7 @@ async function bootstrap() {
     )
     app.use(cookieParser())
 
-    await app.listen(5002)
+    await app.listen(5005)
 }
 
 bootstrap()
