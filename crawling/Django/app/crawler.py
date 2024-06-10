@@ -100,8 +100,8 @@ def crawl_khan(crawl_type, return_data, limit, count) : # 경향신문 크롤링
         
         count[0] += 1
         
-
-        subRes = requests.get(link.attrs['href'], headers=header)
+        news_url = link.attrs['href']
+        subRes = requests.get(news_url, headers=header)
         html = subRes.text
 
         subSoup = BeautifulSoup(html, 'html.parser')
@@ -114,7 +114,7 @@ def crawl_khan(crawl_type, return_data, limit, count) : # 경향신문 크롤링
             content = letter.text.strip().replace('\n', '') # 개행 제거
     
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"company":"경향신문", "title": title, "content": content})
+        data_bundle.append({"company":"경향신문", "url" : news_url, "title": title, "content": content})
 
     return_data.extend(data_bundle)
 
@@ -143,8 +143,8 @@ def crawl_naeil(crawl_type, return_data, limit, count) : # 내일신문 크롤�
         
         count[0] += 1
         
-
-        subRes = requests.get("https://www.naeil.com" + link.find('a').attrs['href'], headers=header)
+        news_url = "https://www.naeil.com" + link.find('a').attrs['href']
+        subRes = requests.get(news_url, headers=header)
         html = subRes.text
 
         subSoup = BeautifulSoup(html, 'html.parser')
@@ -157,7 +157,7 @@ def crawl_naeil(crawl_type, return_data, limit, count) : # 내일신문 크롤�
 
         #print(content)
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"company":"내일신문", "title": title, "content": content})
+        data_bundle.append({"company":"내일신문", "url" : news_url, "title": title, "content": content})
 
     return_data.extend(data_bundle)
 
@@ -188,8 +188,8 @@ def crawl_donga(crawl_type, return_data, limit, count) : # 동아일보 크롤�
         
         count[0] += 1
         
-
-        subRes = requests.get(link.find('a').attrs['href'], headers=header)
+        news_url = link.find('a').attrs['href']
+        subRes = requests.get(news_url, headers=header)
         html = subRes.text
 
         subSoup = BeautifulSoup(html, 'html.parser')
@@ -201,7 +201,7 @@ def crawl_donga(crawl_type, return_data, limit, count) : # 동아일보 크롤�
             content = letter.text.strip().replace('\n', '') # 개행 제거
 
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"company":"동아일보", "title": title, "content": content})
+        data_bundle.append({"company":"동아일보", "url" : news_url, "title": title, "content": content})
 
     return_data.extend(data_bundle)
 
@@ -232,8 +232,8 @@ def crawl_joongang(crawl_type, return_data, limit, count) : # 중앙일보 크�
         
         count[0] += 1
         
-
-        subRes = requests.get(link.find('a').attrs['href'], headers=header)
+        news_url = link.find('a').attrs['href']
+        subRes = requests.get(news_url, headers=header)
         html = subRes.text
 
         subSoup = BeautifulSoup(html, 'html.parser')
@@ -245,7 +245,7 @@ def crawl_joongang(crawl_type, return_data, limit, count) : # 중앙일보 크�
             content = letter.text.strip().replace('\n', '') # 개행 제거
 
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"company":"중앙일보", "title": title, "content": content})
+        data_bundle.append({"company":"중앙일보", "url" : news_url, "title": title, "content": content})
         
 
     #print(data_bundle)
@@ -279,8 +279,8 @@ def crawl_munhwa(crawl_type, return_data, limit, count) : # 문화일보 크롤�
         
         count[0] += 1
         
-
-        subRes = requests.get("https:" + link.attrs['href'], headers=header)
+        news_url = "https:" + link.attrs['href']
+        subRes = requests.get(news_url, headers=header)
         html = subRes.content.decode('euc-kr','replace') # 인코딩을 euc-kr로 바꿈
 
         subSoup = BeautifulSoup(html, 'html.parser')
@@ -292,7 +292,7 @@ def crawl_munhwa(crawl_type, return_data, limit, count) : # 문화일보 크롤�
             content = letter.text.strip().replace('\n', '') # 개행 제거
 
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"company":"문화일보", "title": title, "content": content})
+        data_bundle.append({"company":"문화일보", "url" : news_url, "title": title, "content": content})
 
     return_data.extend(data_bundle)
     
@@ -324,8 +324,8 @@ def crawl_seoulNews(crawl_type, return_data, limit, count) : # 서울신문 크�
         
         count[0] += 1
         
-
-        subRes = requests.get("https://www.seoul.co.kr/" + link.find('a').attrs['href'], headers=header)
+        news_url = "https://www.seoul.co.kr/" + link.find('a').attrs['href']
+        subRes = requests.get(news_url, headers=header)
         html = subRes.content.decode('utf-8','replace') # 인코딩을 utf-8로 바꿈
 
         subSoup = BeautifulSoup(html, 'html.parser')
@@ -341,7 +341,7 @@ def crawl_seoulNews(crawl_type, return_data, limit, count) : # 서울신문 크�
             content = content.replace('\r', '')
 
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"company":"서울신문", "title": title, "content": content})
+        data_bundle.append({"company":"서울신문", "url" : news_url, "title": title, "content": content})
 
     return_data.extend(data_bundle)
     
@@ -374,8 +374,8 @@ def crawl_seoulIlbo(crawl_type, return_data, limit, count) : # 서울일보 크�
         
         count[0] += 1
         
-
-        subRes = requests.get("https://www.seoulilbo.com/"+link.find('a').attrs['href'], headers=header)
+        news_url = "https://www.seoulilbo.com/"+link.find('a').attrs['href']
+        subRes = requests.get(news_url, headers=header)
         html = subRes.text
 
         subSoup = BeautifulSoup(html, 'html.parser')
@@ -390,7 +390,7 @@ def crawl_seoulIlbo(crawl_type, return_data, limit, count) : # 서울일보 크�
             content = letter # 개행 제거
 
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"company":"서울일보", "title": title, "content": content})
+        data_bundle.append({"company":"서울일보", "url" : news_url, "title": title, "content": content})
 
     
     return_data.extend(data_bundle)
@@ -420,7 +420,9 @@ def crawl_segye(crawl_type) : # 세계일보 크롤링
             break
         
         count[0] += 1
-        subRes = requests.get(link.attrs['href'], headers=header)
+
+        news_url = link.attrs['href']
+        subRes = requests.get(news_url, headers=header)
         html = subRes.text
 
         subSoup = BeautifulSoup(html, 'html.parser')
@@ -436,7 +438,7 @@ def crawl_segye(crawl_type) : # 세계일보 크롤링
             content = content.replace('\r', '')
 
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"company":"경향신문", "title": title, "content": content})
+        data_bundle.append({"company":"세계일보", "url" : news_url, "title": title, "content": content})
 
     return_data.extend(data_bundle)
 '''
@@ -469,13 +471,12 @@ def crawl_asia(crawl_type, return_data, limit, count) : # 아시아투데이 크
         
         count[0] += 1
         
-
-        subRes = requests.get("https://www.asiatoday.co.kr" + link.attrs['href'], headers=header)
+        news_url = "https://www.asiatoday.co.kr" + link.attrs['href']
+        subRes = requests.get(news_url, headers=header)
         html = subRes.text
         
         subSoup = BeautifulSoup(html, 'html.parser')
         article_text = subSoup.select('.news_bm')
-
         
         if(crawl_type in SPECIALTAG) :
             title = link.find('h5')
@@ -488,7 +489,7 @@ def crawl_asia(crawl_type, return_data, limit, count) : # 아시아투데이 크
             content = content.replace("\xa0", ' ')
 
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"company":"아시아투데이", "title": title, "content": content})
+        data_bundle.append({"company":"아시아투데이", "url" : news_url, "title": title, "content": content})
 
     return_data.extend(data_bundle)
     
@@ -515,7 +516,8 @@ def crawl_naver(crawl_type, return_data, limit, count) : # 네이버 뉴스 크�
         
         count[0] += 1
         
-        subRes = requests.get(link.attrs['href'], headers=header)
+        news_url = link.attrs['href']
+        subRes = requests.get(news_url, headers=header)
         html = subRes.text
         subSoup = BeautifulSoup(html, 'html.parser')
 
@@ -527,7 +529,7 @@ def crawl_naver(crawl_type, return_data, limit, count) : # 네이버 뉴스 크�
             content = letter.text.strip()
     
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"company":"네이버뉴스", "title": title, "content": content})
+        data_bundle.append({"company":"네이버뉴스", "url" : news_url, "title": title, "content": content})
 
     return_data.extend(data_bundle)
 
@@ -554,7 +556,9 @@ def crawl_daum(crawl_type, return_data, limit, count) : # 다음 뉴스 크롤�
         
         count[0] += 1
 
-        subRes = requests.get(link.attrs['href'], headers=header)
+
+        news_url = link.attrs['href']
+        subRes = requests.get(news_url, headers=header)
         html = subRes.text
         subSoup = BeautifulSoup(html, 'html.parser')
 
@@ -566,6 +570,6 @@ def crawl_daum(crawl_type, return_data, limit, count) : # 다음 뉴스 크롤�
             content = letter.text.strip().replace('\n', '') # 개행 제거
     
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"company":"다음뉴스", "title": title, "content": content})
+        data_bundle.append({"company":"다음뉴스", "url" : news_url, "title": title, "content": content})
 
     return_data.extend(data_bundle)
