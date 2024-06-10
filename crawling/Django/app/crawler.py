@@ -4,21 +4,26 @@ import threading
 from bs4 import BeautifulSoup
 
 
+crawl_limit = 50 # 최대 크롤링 가능 개수
+
 def crawling(crawl_type) :
     #경향신문 O, 내일신문 O , 동아일보 O, 문화일보 O, 서울신문 O, 서울일보 O, 세계일보 X (크롤링 허용 X), 
     #아시아투데이 O, 조선일보, 중앙일보 O , 한겨레 (크롤링 허용 X), 한국일보 (크롤링 허용 X)
 
     data_bundle = []
 
+    
+    crawl_count = [0]# 정수 데이터를 call-by-reference 방식으로 전달하기 위하여 리스트로 선언
+
     #각 크롤링 함수들을 쓰레드에 지정
-    t1 = threading.Thread(target = crawl_khan, args=(crawl_type, data_bundle))#경향신문
-    t2 = threading.Thread(target = crawl_naeil, args=(crawl_type, data_bundle))#내일신문
-    t3 = threading.Thread(target = crawl_donga, args=(crawl_type, data_bundle))#동아일보
-    t4 = threading.Thread(target = crawl_munhwa, args=(crawl_type, data_bundle))#문화일보
-    t5 = threading.Thread(target = crawl_seoulNews, args=(crawl_type, data_bundle))#서울신문
-    t6 = threading.Thread(target = crawl_seoulIlbo, args=(crawl_type, data_bundle))#서울일보
-    t7 = threading.Thread(target = crawl_asia, args=(crawl_type, data_bundle))#아시아투데이
-    t8 = threading.Thread(target = crawl_joongang, args=(crawl_type, data_bundle))#중앙일보
+    t1 = threading.Thread(target = crawl_khan, args=(crawl_type, data_bundle, crawl_limit, crawl_count))#경향신문
+    t2 = threading.Thread(target = crawl_naeil, args=(crawl_type, data_bundle, crawl_limit, crawl_count))#내일신문
+    t3 = threading.Thread(target = crawl_donga, args=(crawl_type, data_bundle, crawl_limit, crawl_count))#동아일보
+    t4 = threading.Thread(target = crawl_munhwa, args=(crawl_type, data_bundle, crawl_limit, crawl_count))#문화일보
+    t5 = threading.Thread(target = crawl_seoulNews, args=(crawl_type, data_bundle, crawl_limit, crawl_count))#서울신문
+    t6 = threading.Thread(target = crawl_seoulIlbo, args=(crawl_type, data_bundle, crawl_limit, crawl_count))#서울일보
+    t7 = threading.Thread(target = crawl_asia, args=(crawl_type, data_bundle, crawl_limit, crawl_count))#아시아투데이
+    t8 = threading.Thread(target = crawl_joongang, args=(crawl_type, data_bundle, crawl_limit, crawl_count))#중앙일보
     
 
     #쓰레드를 통해 크롤링을 동시에 실시
@@ -54,7 +59,7 @@ def crawling(crawl_type) :
 
 def selectCrawlType(crawl_type) :
     CRAWL_TYPES = ['economy', 'politics', 'society', 'culture', 'science', 'world', 'sport', 'enter', 'people', 'education'] # 크롤링 타입 리스트
-    #경제, 정치, 사회, 문화, 과학(IT), 세계, 스포츠, 연예
+    #경제, 정치, 사회, 문화, 과학(IT), 세계, 스포츠, 연예, + 인물, 교육
 
     #crawl_type 에 따라 조건문 수행
     if(crawl_type in CRAWL_TYPES ) : # 리스트에 포함된 타입인 경우에만 수행
@@ -69,7 +74,7 @@ def selectCrawlType(crawl_type) :
 
     
 
-def crawl_khan(crawl_type, return_data) : # 경향신문 크롤링, 경향 신문에는 사진과 제목만 존재하고 본문이 없는 경우도 있음. 현제 1페이지만 크롤링 가능. 기능 추가 필요함
+def crawl_khan(crawl_type, return_data, limit, count) : # 경향신문 크롤링, 경향 신문에는 사진과 제목만 존재하고 본문이 없는 경우도 있음. 현제 1페이지만 크롤링 가능. 기능 추가 필요함
     TYPETAG = {'politics' : 'politics', 
                'economy' : 'economy', 'society' : 'national', 'culture' : 'culture', 'science' : 'science', 'world' : 'world', 'sport' : 'sports'} # 타입에 따른 주소 태그의 딕셔너리
     
@@ -86,7 +91,15 @@ def crawl_khan(crawl_type, return_data) : # 경향신문 크롤링, 경향 신�
     newsBox = soup.find(class_='main-list-wrap')
     news = newsBox.select('.line_clamp2')
 
+    
+
     for link in news: # 뉴스마다 제목과 내용을 따옴
+
+        if count[0] >= limit :
+            break
+        
+        count[0] += 1
+        
 
         subRes = requests.get(link.attrs['href'], headers=header)
         html = subRes.text
@@ -101,11 +114,11 @@ def crawl_khan(crawl_type, return_data) : # 경향신문 크롤링, 경향 신�
             content = letter.text.strip().replace('\n', '') # 개행 제거
     
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"title": title, "content": content})
+        data_bundle.append({"company":"경향신문", "title": title, "content": content})
 
     return_data.extend(data_bundle)
 
-def crawl_naeil(crawl_type, return_data) : # 내일신문 크롤링
+def crawl_naeil(crawl_type, return_data, limit, count) : # 내일신문 크롤링
     TYPETAG = {'politics' : 'politics',
                'economy' : 'economy', 'society' : 'policy', 'science' : 'industry', 'world' : 'diplomacy'} # 타입에 따른 주소 태그의 딕셔너리
 
@@ -122,7 +135,14 @@ def crawl_naeil(crawl_type, return_data) : # 내일신문 크롤링
     newsBox = soup.find(class_='story-list')
     news = newsBox.find_all(class_ = 'headline')
 
+    
     for link in news: # 뉴스마다 제목과 내용을 따옴
+
+        if count[0] >= limit :
+            break
+        
+        count[0] += 1
+        
 
         subRes = requests.get("https://www.naeil.com" + link.find('a').attrs['href'], headers=header)
         html = subRes.text
@@ -137,11 +157,11 @@ def crawl_naeil(crawl_type, return_data) : # 내일신문 크롤링
 
         #print(content)
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"title": title, "content": content})
+        data_bundle.append({"company":"내일신문", "title": title, "content": content})
 
     return_data.extend(data_bundle)
 
-def crawl_donga(crawl_type, return_data) : # 동아일보 크롤링
+def crawl_donga(crawl_type, return_data, limit, count) : # 동아일보 크롤링
     TYPETAG = {'politics' : 'Politics',
                'economy' : 'Economy', 'society' : 'Society', 'culture' : 'Culture', 'world' : 'Inter', 'sport' : 'Sports',
                'enter' : 'Entertainment'} # 타입에 따른 주소 태그의 딕셔너리
@@ -159,7 +179,16 @@ def crawl_donga(crawl_type, return_data) : # 동아일보 크롤링
     newsBox = soup.find(class_='row_list')
     news = newsBox.select('.tit')
     
+    
+
     for link in news: # 뉴스마다 제목과 내용을 따옴
+
+        if count[0] >= limit :
+            break
+        
+        count[0] += 1
+        
+
         subRes = requests.get(link.find('a').attrs['href'], headers=header)
         html = subRes.text
 
@@ -172,11 +201,11 @@ def crawl_donga(crawl_type, return_data) : # 동아일보 크롤링
             content = letter.text.strip().replace('\n', '') # 개행 제거
 
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"title": title, "content": content})
+        data_bundle.append({"company":"동아일보", "title": title, "content": content})
 
     return_data.extend(data_bundle)
 
-def crawl_joongang(crawl_type, return_data) : # 중앙일보 크롤링
+def crawl_joongang(crawl_type, return_data, limit, count) : # 중앙일보 크롤링
     TYPETAG = {'politics' : 'politics', 
                'economy' : 'money', 'society' : 'society', 'culture' : 'culture', 'world' : 'world', 'sport' : 'sports'} # 타입에 따른 주소 태그의 딕셔너리
 
@@ -193,7 +222,17 @@ def crawl_joongang(crawl_type, return_data) : # 중앙일보 크롤링
     newsBox = soup.find(class_='story_list')
     news = newsBox.select('.headline')
     #print(news)
+
+    
+
     for link in news: # 뉴스마다 제목과 내용을 따옴
+
+        if count[0] >= limit :
+            break
+        
+        count[0] += 1
+        
+
         subRes = requests.get(link.find('a').attrs['href'], headers=header)
         html = subRes.text
 
@@ -206,13 +245,14 @@ def crawl_joongang(crawl_type, return_data) : # 중앙일보 크롤링
             content = letter.text.strip().replace('\n', '') # 개행 제거
 
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"title": title, "content": content})
+        data_bundle.append({"company":"중앙일보", "title": title, "content": content})
+        
 
     #print(data_bundle)
 
     return_data.extend(data_bundle)
 
-def crawl_munhwa(crawl_type, return_data) : # 문화일보 크롤링
+def crawl_munhwa(crawl_type, return_data, limit, count) : # 문화일보 크롤링
     TYPETAG = {'politics' : 'politics',
                'economy' : 'economy', 'society' : 'society', 'culture' : 'culture', 'world' : 'international',
                'sport' : 'sports', 'enter' : 'ent', 'people':'people'} # 타입에 따른 주소 태그의 딕셔너리
@@ -230,7 +270,16 @@ def crawl_munhwa(crawl_type, return_data) : # 문화일보 크롤링
     newsBox = soup.find(class_='news_list')
     news = newsBox.select('a.title')
     
+    
+
     for link in news: # 뉴스마다 제목과 내용을 따옴
+
+        if count[0] >= limit :
+            break
+        
+        count[0] += 1
+        
+
         subRes = requests.get("https:" + link.attrs['href'], headers=header)
         html = subRes.content.decode('euc-kr','replace') # 인코딩을 euc-kr로 바꿈
 
@@ -243,11 +292,12 @@ def crawl_munhwa(crawl_type, return_data) : # 문화일보 크롤링
             content = letter.text.strip().replace('\n', '') # 개행 제거
 
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"title": title, "content": content})
+        data_bundle.append({"company":"문화일보", "title": title, "content": content})
 
     return_data.extend(data_bundle)
+    
 
-def crawl_seoulNews(crawl_type, return_data) : # 서울신문 크롤링
+def crawl_seoulNews(crawl_type, return_data, limit, count) : # 서울신문 크롤링
     TYPETAG = {'politics' : 'politics',
                 'economy' : 'economy', 'society' : 'society', 'culture' : 'life', 'world' : 'international', 'sport' : 'sport',
                 'people' : 'peoples'} # 타입에 따른 주소 태그의 딕셔너리
@@ -265,7 +315,16 @@ def crawl_seoulNews(crawl_type, return_data) : # 서울신문 크롤링
     newsBox = soup.find(class_='pageListWrap')
     news = newsBox.select('.articleTitle')
     
+    
+
     for link in news: # 뉴스마다 제목과 내용을 따옴
+
+        if count[0] >= limit :
+            break
+        
+        count[0] += 1
+        
+
         subRes = requests.get("https://www.seoul.co.kr/" + link.find('a').attrs['href'], headers=header)
         html = subRes.content.decode('utf-8','replace') # 인코딩을 utf-8로 바꿈
 
@@ -282,11 +341,13 @@ def crawl_seoulNews(crawl_type, return_data) : # 서울신문 크롤링
             content = content.replace('\r', '')
 
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"title": title, "content": content})
+        data_bundle.append({"company":"서울신문", "title": title, "content": content})
 
     return_data.extend(data_bundle)
+    
 
-def crawl_seoulIlbo(crawl_type, return_data) : # 서울일보 크롤링
+
+def crawl_seoulIlbo(crawl_type, return_data, limit, count) : # 서울일보 크롤링
     TYPETAG = {'politics' : '8',
                 'economy' : '9', 'society' : '10', 'culture' : '11', 'enter' : '12', 'world' : '14',
                 'education' : '20'} # 타입에 따른 주소 태그의 딕셔너리
@@ -304,7 +365,16 @@ def crawl_seoulIlbo(crawl_type, return_data) : # 서울일보 크롤링
     newsBox = soup.find(class_='section-body')
     news = newsBox.select('h4', attrs={"class": "titles"})
     
+    
+
     for link in news: # 뉴스마다 제목과 내용을 따옴
+
+        if count[0] >= limit :
+            break
+        
+        count[0] += 1
+        
+
         subRes = requests.get("https://www.seoulilbo.com/"+link.find('a').attrs['href'], headers=header)
         html = subRes.text
 
@@ -320,8 +390,9 @@ def crawl_seoulIlbo(crawl_type, return_data) : # 서울일보 크롤링
             content = letter # 개행 제거
 
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"title": title, "content": content})
+        data_bundle.append({"company":"서울일보", "title": title, "content": content})
 
+    
     return_data.extend(data_bundle)
 
 '''
@@ -345,6 +416,10 @@ def crawl_segye(crawl_type) : # 세계일보 크롤링
     news = newsBox.select('ul>li>a')
     
     for link in news: # 뉴스마다 제목과 내용을 따옴
+        if count[0] >= limit :
+            break
+        
+        count[0] += 1
         subRes = requests.get(link.attrs['href'], headers=header)
         html = subRes.text
 
@@ -361,12 +436,12 @@ def crawl_segye(crawl_type) : # 세계일보 크롤링
             content = content.replace('\r', '')
 
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"title": title, "content": content})
+        data_bundle.append({"company":"경향신문", "title": title, "content": content})
 
     return_data.extend(data_bundle)
 '''
 
-def crawl_asia(crawl_type, return_data) : # 아시아투데이 크롤링
+def crawl_asia(crawl_type, return_data, limit, count) : # 아시아투데이 크롤링
     TYPETAG = {'politics' : '2',
                 'society' : '3', 'economy' : '4', 'world' : '6', 'culture' : '7&d2=5', 'sport' : '7&d2=7',
                 'enter' : '7&d2=2'} # 타입에 따른 주소 태그의 딕셔너리
@@ -388,6 +463,13 @@ def crawl_asia(crawl_type, return_data) : # 아시아투데이 크롤링
     news = newsBox.select('dl>dd>a')
     
     for link in news: # 뉴스마다 제목과 내용을 따옴
+
+        if count[0] >= limit :
+            break
+        
+        count[0] += 1
+        
+
         subRes = requests.get("https://www.asiatoday.co.kr" + link.attrs['href'], headers=header)
         html = subRes.text
         
@@ -406,13 +488,14 @@ def crawl_asia(crawl_type, return_data) : # 아시아투데이 크롤링
             content = content.replace("\xa0", ' ')
 
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"title": title, "content": content})
+        data_bundle.append({"company":"아시아투데이", "title": title, "content": content})
 
     return_data.extend(data_bundle)
+    
 
 #Not in use
 
-def crawl_naver(crawl_type, return_data) : # 네이버 뉴스 크롤링
+def crawl_naver(crawl_type, return_data, limit, count) : # 네이버 뉴스 크롤링
     TYPETAG = {'politics' : 100, 
                'economy' : 101, 'society' : 102, 'culture' : 103, 'science' : 105, 'world' : 104} # 타입에 따른 주소 태그의 딕셔너리
 
@@ -427,6 +510,11 @@ def crawl_naver(crawl_type, return_data) : # 네이버 뉴스 크롤링
     news = newsBox.select('.sa_text_title')
 
     for link in news: # 뉴스마다 제목과 내용을 따옴
+        if count[0] >= limit :
+            break
+        
+        count[0] += 1
+        
         subRes = requests.get(link.attrs['href'], headers=header)
         html = subRes.text
         subSoup = BeautifulSoup(html, 'html.parser')
@@ -439,11 +527,11 @@ def crawl_naver(crawl_type, return_data) : # 네이버 뉴스 크롤링
             content = letter.text.strip()
     
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"title": title, "content": content})
+        data_bundle.append({"company":"네이버뉴스", "title": title, "content": content})
 
     return_data.extend(data_bundle)
 
-def crawl_daum(crawl_type, return_data) : # 다음 뉴스 크롤링
+def crawl_daum(crawl_type, return_data, limit, count) : # 다음 뉴스 크롤링
     TYPETAG = {'politics' : 'politics', 
                'economy' : 'economic', 'society' : 'society', 'culture' : 'culture', 'science' : 'digital', 'world' : 'foreign'} # 타입에 따른 주소 태그의 딕셔너리
     
@@ -461,6 +549,11 @@ def crawl_daum(crawl_type, return_data) : # 다음 뉴스 크롤링
     news = newsBox.select('.link_txt')
 
     for link in news: # 뉴스마다 제목과 내용을 따옴
+        if count[0] >= limit :
+            break
+        
+        count[0] += 1
+
         subRes = requests.get(link.attrs['href'], headers=header)
         html = subRes.text
         subSoup = BeautifulSoup(html, 'html.parser')
@@ -473,6 +566,6 @@ def crawl_daum(crawl_type, return_data) : # 다음 뉴스 크롤링
             content = letter.text.strip().replace('\n', '') # 개행 제거
     
         # 제목과 내용 배열에 삽입
-        data_bundle.append({"title": title, "content": content})
+        data_bundle.append({"company":"다음뉴스", "title": title, "content": content})
 
     return_data.extend(data_bundle)
