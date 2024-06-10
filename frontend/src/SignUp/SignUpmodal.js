@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import styles from './SignUpmodal.module.css';
 
-import requestApi from "../plugins/api-setting";
+import {requestApi} from "../plugins/api-setting";
 import {isEmpty, isValidEmail} from "../plugins/validators";
 import {useNavigate} from "react-router-dom";
 import {setAccessToken, setUserName} from "../store/user-slice";
@@ -45,6 +45,14 @@ function SignUpmodal({onClose}) {
 
         if (!isValidEmail(signUpInfo.id)) {
             alert("이메일 형식이 맞지 않습니다.")
+            return
+        }
+
+        if (keywords
+            .filter(keyword => keyword.checked)
+            .map(keyword => keyword.text).length === 0
+        ) {
+            alert("관심 분야를 최소 1개 설정해야합니다.")
             return
         }
 

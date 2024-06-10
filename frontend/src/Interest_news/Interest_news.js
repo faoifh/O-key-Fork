@@ -3,16 +3,13 @@ import styles from './Interest_news.module.css';
 import Menubar from "../components/menubar";
 import {useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
+import {keywordsApi} from "../plugins/api-setting";
 
 
 export default function Interest_news() {
 
-    const [isOpen, setIsOpen] = useState(false);
-
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
-
-    const [selectedCategory, setSelectedCategory] = useState('전체');
 
     const [keywords, setKeywords] = useState([
         {id: 1, text: '정치', checked: false},
@@ -20,9 +17,11 @@ export default function Interest_news() {
         {id: 3, text: '사회', checked: false},
         {id: 4, text: '문화', checked: false},
         {id: 5, text: '국제', checked: false},
-        {id: 6, text: '지역', checked: false},
         {id: 7, text: '스포츠', checked: false},
         {id: 8, text: 'IT/과학', checked: false},
+        {id: 9, text: '교육', checked: false},
+        {id: 10, text: '엔터테인먼트', checked: false},
+        {id: 11, text: '인물', checked: false},
     ]);
     const reduxInfo = useSelector((state) => state.userInfo)
 
@@ -34,20 +33,12 @@ export default function Interest_news() {
             navigate("/");
         }
 
-        const updatedKeywords= keywords.map(keyword =>
-            reduxInfo.interests.includes(keyword.text) ? { ...keyword, checked: true } : keyword
+        const updatedKeywords = keywords.map(keyword =>
+            reduxInfo.interests.includes(keyword.text) ? {...keyword, checked: true} : keyword
         );
 
         setKeywords(updatedKeywords);
-    }, []);
-
-    const toggleDropdown = () => {
-        setIsOpen(!isOpen);
-    };
-
-    const handleCategoryClick = (category) => {
-        setSelectedCategory(category);
-    };
+    }, [reduxInfo, navigate]);
 
     const handleCheckboxChange = (id) => {
         setKeywords((prevKeywords) =>
@@ -56,6 +47,66 @@ export default function Interest_news() {
             )
         );
     };
+
+    function Article({interest}) {
+
+        const [news, setNews] = useState([]);
+        const [loading, setLoading] = useState(false);
+
+        const newsTypesConvert = [
+            {text: '정치', en: 'politics'},
+            {text: '경제', en: 'economy'},
+            {text: '사회', en: 'society'},
+            {text: '문화', en: 'culture'},
+            {text: '국제', en: 'world'},
+            {text: '스포츠', en: 'sport'},
+            {text: 'IT/과학', en: 'science'},
+            {text: '교육', en: 'education'},
+            {text: '엔터테인먼트', en: 'enter'},
+            {text: '인물', en: 'people'}
+        ];
+        const matchingType = newsTypesConvert.find(data => data.text === interest);
+
+        useEffect(() => {
+            if (matchingType) {
+                setLoading(true);
+                keywordsApi.get(`/news/`, {
+                    params: {
+                        crawl_type: matchingType.en
+                    },
+                    withCredentials: true
+                }).then(res => {
+                    setNews(res.data.data);
+                    setLoading(false);
+                }).catch(err => {
+                    console.log(err);
+                    setLoading(false);
+                });
+            }
+        }, []);
+
+        return (
+            <div>
+                <h1>{interest}</h1>
+                <div className={styles['article-container']}>
+                    {loading ? (
+                        <div className={styles.loader}></div>
+                    ) : (
+                        news.map(data => (
+                            <div className={styles['article']} key={data.id} onClick={() => {
+                                window.open(data.url, "_blank");
+                            }}>
+                                <h1>{data.title}</h1>
+                                <p className={styles['article-company']}>{data.company}</p>
+                                <hr/>
+                                <p>{data.content.length > 300 ? `${data.content.substring(0, 300)}...` : data.content}</p>
+                            </div>
+                        ))
+                    )}
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={`${styles.app}`}>
@@ -69,10 +120,10 @@ export default function Interest_news() {
                         </div>
                     </div>
                     <div className={`${styles.keywordbox}`}></div>
-                    <p>관심 키워드</p>
+                    <p className={styles['interests-keywords']}>관심 키워드</p>
                     <div className={`${styles.checkboxContainer}`}>
                         {keywords.map((keyword) => (
-                            <label key={keyword.id} className={styles.checkboxLabel}>
+                            <label className={styles.checkboxLabel} key={keyword.id}>
                                 <input
                                     type="checkbox"
                                     checked={keyword.checked}
@@ -82,6 +133,9 @@ export default function Interest_news() {
                             </label>
                         ))}
                     </div>
+                </div>
+                <div className={styles['contents-container']}>
+                    {reduxInfo.interests.map(data => <Article interest={data} key={data}/>)}
                 </div>
             </div>
         </div>

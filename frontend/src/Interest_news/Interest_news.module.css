@@ -3,50 +3,50 @@ body {
     margin: 0;
     padding: 0;
     background-color: white;
-  }
-  
-  .app {
+}
+
+.app {
     width: 100%;
     min-width: 750px;
-  }
-  
-  .navbar {
+}
+
+.navbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 10px 20px;
     background-color: #fff;
     border-bottom: 1px solid #ddd;
-  }
-  
-  .logo {
-    margin-left : 30px;
+}
+
+.logo {
+    margin-left: 30px;
     color: #006CFF;
     font-family: Lemon;
     font-size: 60px;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-  }
-  
-  .search_bar {
+}
+
+.search_bar {
     display: flex;
     align-items: center;
     border: 1px solid #006CFF;
     border-radius: 5px;
     width: 30%;
-    height: 50px; 
-  }
-  
-  .search_bar input {
+    height: 50px;
+}
+
+.search_bar input {
     border: none;
     outline: none;
     width: 100%;
     padding: 10px;
     font-size: 16px;
-  }
-  
-  .search_bar button {
+}
+
+.search_bar button {
     border: 1px solid #006CFF;
     background: #90BFFF;
     border: none;
@@ -55,16 +55,16 @@ body {
     width: 65px;
     height: 50px;
     border-radius: 5px;
-  }
-  
-  .dropdown, .login {
+}
+
+.dropdown, .login {
     display: flex;
     align-items: center;
     padding: 0 10px;
-    
-  }
-  
-  .dropdown {
+
+}
+
+.dropdown {
     width: 100%;
     display: flex;
     align-items: center;
@@ -74,18 +74,18 @@ body {
     padding: 10px;
     cursor: pointer;
     background-color: #fff;
-  }
-  
-  .dropdownContent {
+}
+
+.dropdownContent {
     display: none;
     background-color: #f9f9f9;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 8px;
     margin-top: 5px;
-  }
-  
-  .loginbtn {
+}
+
+.loginbtn {
     width: 130px;
     height: 60px;
     border-radius: 10px;
@@ -98,28 +98,28 @@ body {
     font-weight: 700;
     line-height: normal;
     cursor: pointer;
-  }
-  
-  .content {
-    padding: 30px;
-  }
+}
 
-  .contentwrapper {
-    padding : 0 0 15px;
+.content {
+    padding: 30px;
+}
+
+.contentwrapper {
+    padding: 0 0 15px;
     border-bottom: 1px solid #CCC;
-  }
-  
-  .keyword_header {
+}
+
+.keyword_header {
     margin-bottom: -60px;
     display: flex;
     align-items: center;
-  }
+}
 
-  .keyword_setting {
+.keyword_setting {
     margin-left: 50px;
-  }
+}
 
-  .settingbtn {
+.settingbtn {
     width: 200px;
     height: 50px;
     border-radius: 100px;
@@ -132,26 +132,26 @@ body {
     font-style: normal;
     font-weight: 700;
     line-height: normal;
-  }
-  
-  .keywordbox {
+}
+
+.keywordbox {
     background-color: #d7e9ff;
     width: 230px;
     height: 30px;
     margin-bottom: 34px;
 
-  }
-  
-  .keyword_header h2 {
+}
+
+.keyword_header h2 {
     color: #010101;
     font-family: Inter;
     font-size: 40px;
     font-style: normal;
     font-weight: 700;
     line-height: normal;
-  }
-  
-  .content p {
+}
+
+.interests-keywords {
     margin-top: -20px;
     color: #5E5E5E;
     font-family: Inter;
@@ -159,14 +159,14 @@ body {
     font-style: normal;
     font-weight: 700;
     line-height: normal;
-  }
+}
 
-  .checkboxContainer {
+.checkboxContainer {
     display: flex;
     gap: 10px;
-  }
+}
 
-  .checkboxLabel {
+.checkboxLabel {
     display: flex;
     align-items: center;
     color: #5E5E5E;
@@ -175,5 +175,70 @@ body {
     font-style: normal;
     font-weight: 700;
     line-height: normal;
-  }
+}
+
+.contents-container {
+    text-align: center;
+}
+
+.article-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    text-align: center;
+}
+
+.article{
+    width: 200px;
+    min-width: 20%;
+    height: 400px;
+    max-height: 700px;
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin: 10px 0;
+    cursor: pointer;
+}
+
+.article h1 {
+    font-size: 25px;
+    font-weight: bold;
+    min-height: 72px;
+}
+
+.article-company{
+    text-align: right;
+    color: #989898;
+    margin-bottom: 5px;
+}
+
+.loader {
+    font-weight: bold;
+    font-family: monospace;
+    font-size: 30px;
+    line-height: 1.2em;
+    display: inline-grid;
+}
+
+.loader:before,
+.loader:after {
+    content: "Loading...";
+    grid-area: 1/1;
+    -webkit-mask: linear-gradient(90deg, #000 50%, #0000 0) 0 50%/2ch 100%;
+    color: #0000;
+    text-shadow: 0 0 0 #000, 0 calc(var(--s, 1) * 1.2em) 0 #000;
+    animation: l15 1s infinite;
+}
+
+.loader:after {
+    -webkit-mask-position: 1ch 50%;
+    --s: -1;
+}
+
+
+@keyframes l15 {
+    80%, 100% {
+        text-shadow: 0 calc(var(--s, 1) * -1.2em) 0 #000, 0 0 0 #000
+    }
+}
 

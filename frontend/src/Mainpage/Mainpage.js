@@ -4,7 +4,7 @@ import Modal from '../Login/Modal.js';
 import SignUpmodal from '../SignUp/SignUpmodal.js';
 import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
-import requestApi from "../plugins/api-setting";
+import {requestApi} from "../plugins/api-setting";
 import {setAccessToken, setUserName} from "../store/user-slice";
 import {post} from "axios";
 import {getCurrentDateTime} from "../plugins/date";

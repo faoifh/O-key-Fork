@@ -2,7 +2,7 @@ import styles from "../Mainpage/Mainpage.module.css";
 import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
-import requestApi from "../plugins/api-setting";
+import {requestApi} from "../plugins/api-setting";
 import {setAccessToken, setUserName} from "../store/user-slice";
 
 function Menubar({setIsSignUpModalOpen, setIsLoginModalOpen}) {

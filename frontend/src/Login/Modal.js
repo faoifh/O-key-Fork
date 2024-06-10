@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import styles from './Modal.module.css';
-import requestApi from "../plugins/api-setting";
+import {requestApi} from "../plugins/api-setting";
 import {useDispatch} from "react-redux";
 import {useNavigate} from "react-router-dom";
 import {setAccessToken, setInterests, setUserName} from "../store/user-slice";
