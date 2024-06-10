@@ -62,6 +62,17 @@ export class UserService {
       })
    }
 
+   public async getInterests(id: string) {
+      const userInterests = await this.userRepository.findOne({
+         select: ["interests"],
+         where: {
+            id: id
+         }
+      })
+
+      return userInterests.interests.split(',')
+   }
+
    private async encryptPassword(password: string) {
       const saltRounds = 10
 

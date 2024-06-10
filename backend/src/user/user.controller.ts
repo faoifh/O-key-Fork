@@ -22,6 +22,8 @@ export class UserController {
    async login(@Body() body: any, @Res({ passthrough: true }) res: any) {
       const loginResult = await this.userService.login(body)
 
+      const getInterests = await this.userService.getInterests(body.id)
+
       res.setHeader("Authorization", "Bearer " + loginResult.accessToken)
 
       res.cookie("refreshToken", loginResult.refreshToken, {
@@ -30,7 +32,10 @@ export class UserController {
          // maxAge: 24 * 60 * 60 * 1000
       })
 
-      return loginResult.name
+      return {
+         name: loginResult.name,
+         interests: getInterests
+      }
 
    }
    @Post("/logout")
