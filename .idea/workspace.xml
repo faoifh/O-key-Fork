@@ -5,14 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9b75ec0a-8bf7-41ed-85b7-2a6e6b93a9e9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/menubar.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.env.development" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.env.development" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.env.production" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.env.production" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/public/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/Interest_news/Interest_news.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Interest_news/Interest_news.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/Login/Modal.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Login/Modal.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/Mainpage/Mainpage.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Mainpage/Mainpage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/store/user-slice.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/store/user-slice.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/Interest_news/Interest_news.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Interest_news/Interest_news.module.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,6 +18,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="JavaScript File" />
+        <option value="JSX File" />
       </list>
     </option>
   </component>
@@ -69,7 +65,11 @@
       <option name="presentableId" value="Default" />
       <updated>1717920210879</updated>
       <workItem from="1717920212055" duration="13072000" />
-      <workItem from="1717989459986" duration="2268000" />
+      <workItem from="1717989459986" duration="6776000" />
+      <workItem from="1717998953624" duration="6103000" />
+      <workItem from="1718012498095" duration="2307000" />
+      <workItem from="1718040403745" duration="4964000" />
+      <workItem from="1718078977017" duration="3082000" />
     </task>
     <servers />
   </component>

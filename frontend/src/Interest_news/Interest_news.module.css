@@ -190,8 +190,8 @@ body {
 }
 
 .article{
-    width: 200px;
-    min-width: 20%;
+    width: 20%;
+    min-width: 320px;
     height: 400px;
     max-height: 700px;
     border: 1px solid #ccc;
