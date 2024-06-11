@@ -42,19 +42,15 @@ function Menubar({setIsSignUpModalOpen, setIsLoginModalOpen}) {
                 {reduxInfo.userName
                     ?
                     <>
-                        <p>{reduxInfo.userName}</p>
+                        <div className={`${styles.interestnews}`}>
+                            <button className={`${styles.interestbtn}`} onClick={() => navigate("/interest_news")}>내 관심 뉴스 보기</button>
+                        </div>
+                        <div className={`${styles.userinfo}`}>{reduxInfo.userName}</div>
                         <p onClick={logout} className={`${styles.logoutbtn}`}>로그아웃</p>
                     </>
                     :
                     <button onClick={showLoginModal} className={`${styles.loginbtn}`}>로그인</button>
                 }
-                <>
-                        <div className={`${styles.interestnews}`}>
-                            <button className={`${styles.interestbtn}`} onClick={() => navigate("/interest_news")}>내 관심 뉴스 보기</button>
-                        </div>
-                        <div className={`${styles.userinfo}`}>김도윤</div>
-                        <p onClick={logout} className={`${styles.logoutbtn}`}>로그아웃</p>
-                    </>
             </div>
         </div>
     );
