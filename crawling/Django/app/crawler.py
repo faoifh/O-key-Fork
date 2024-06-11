@@ -76,7 +76,7 @@ def selectCrawlType(crawl_type) :
 
 def crawl_khan(crawl_type, return_data, limit, count) : # 경향신문 크롤링, 경향 신문에는 사진과 제목만 존재하고 본문이 없는 경우도 있음. 현제 1페이지만 크롤링 가능. 기능 추가 필요함
     TYPETAG = {'politics' : 'politics', 
-               'economy' : 'economy', 'society' : 'national', 'culture' : 'culture', 'science' : 'science', 'world' : 'world', 'sport' : 'sports'} # 타입에 따른 주소 태그의 딕셔너리
+               'economy' : 'economy', 'society' : 'national', 'culture' : 'culture', 'science' : 'science/science-general/articles', 'world' : 'world', 'sport' : 'sports'} # 타입에 따른 주소 태그의 딕셔너리
     
     if not (crawl_type in TYPETAG) :
         return
@@ -115,7 +115,7 @@ def crawl_khan(crawl_type, return_data, limit, count) : # 경향신문 크롤링
     
         # 제목과 내용 배열에 삽입
         data_bundle.append({"company":"경향신문", "url" : news_url, "title": title, "content": content})
-
+    
     return_data.extend(data_bundle)
 
 def crawl_naeil(crawl_type, return_data, limit, count) : # 내일신문 크롤링
@@ -571,5 +571,6 @@ def crawl_daum(crawl_type, return_data, limit, count) : # 다음 뉴스 크롤�
     
         # 제목과 내용 배열에 삽입
         data_bundle.append({"company":"다음뉴스", "url" : news_url, "title": title, "content": content})
+
 
     return_data.extend(data_bundle)
