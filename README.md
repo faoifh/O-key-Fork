@@ -28,6 +28,8 @@ pip3 install BeautifulSoup4
 pip3 install requests
 pip3 install django
 pip3 install djangorestframework
+pip install JPype1
+pip install konlpy
 ```
 
 ### 사용법
@@ -62,6 +64,11 @@ pip3 install djangorestframework
 > education : 교육
 
 해당 type들은 crawler.selectCrawlType 메소드의 CRAWL_TYPES 리스트에 작성되어 있습니다.
+
+
+### 반환되는 데이터
+
+크롤링 타입, 각 기사의 언론사, 제목, 본문 내용, 가장 많이 언급된 상위 100개 키워드
 
 ---
 
