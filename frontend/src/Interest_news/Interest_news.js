@@ -23,6 +23,7 @@ export default function Interest_news() {
         { id: 10, text: '엔터테인먼트', checked: false },
         { id: 11, text: '인물', checked: false },
     ]);
+    
     const reduxInfo = useSelector((state) => state.userInfo);
 
     const navigate = useNavigate();
@@ -41,7 +42,7 @@ export default function Interest_news() {
         setKeywords(updatedKeywords);
     }, [reduxInfo, navigate]);
 
-    const handleCheckboxChange = async (id) => {
+   const handleCheckboxChange = async (id) => {
         const updatedKeywords = keywords.map((keyword) =>
             keyword.id === id ? { ...keyword, checked: !keyword.checked } : keyword
         );
