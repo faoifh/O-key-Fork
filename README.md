@@ -72,6 +72,7 @@ git clone https://github.com/O-key-Do-key/O-key.git
 - djangorestframwork
 - BeautifulSoup4
 - requests
+- konlpy
 
 
 ### 라이브러리 설치

@@ -1,0 +1,207 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: white;
+}
+
+.app {
+    width: 100%;
+    min-width: 750px;
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
+.logo {
+    margin-left: 30px;
+    color: #006CFF;
+    font-family: Lemon;
+    font-size: 60px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    cursor: pointer;
+}
+
+.interestnews {
+    display: flex;
+    margin-right: 30px;
+}
+
+.interestbtn {
+    width: 200px;
+    height: 50px;
+    border-radius: 10px;
+    background: #549CFF;        
+    border: none;
+    color:white;
+    font-family: Inter;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0px 0px 10px 0px #B4D4FF;
+}
+
+.login {
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+
+}
+
+.loginbtn {
+    width: 110px;
+    height: 50px;
+    border-radius: 10px;
+    border: 1px solid #A8A8A8;
+    background: #FFF;
+    color: #5E5E5E;
+    font-family: Inter;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    cursor: pointer;
+}
+
+.logoutbtn {
+    color: #5E5E5E;
+    font-family: Inter;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    cursor: pointer;
+    margin-left: 20px;
+}
+
+.userinfo {
+    width: 110px;
+    height: 50px;
+    border-radius: 10px;
+    border: 1px solid #A8A8A8;
+    background: #FFF;
+    color: #006CFF;
+    font-family: Inter;
+    font-size: 17px;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.content {
+    padding: 30px;
+}
+
+.keyword_header {
+    margin-bottom: -60px;
+}
+
+.keywordbox {
+    background-color: #d7e9ff;
+    width: 260px;
+    height: 30px;
+    margin-bottom: 34px;
+}
+
+.keyword_header h2 {
+    color: #010101;
+    font-family: Inter;
+    font-size: 40px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.content p {
+    margin-top: -30px;
+    color: #010101;
+    font-family: Inter;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.news_count {
+    color: #006CFF;
+    font-size: 20px;
+}
+
+.categories_wrapper {
+    border: 1px solid #B4D4FF;
+    background: #F5F8FC;
+    height: 570px;
+    width: 100%;
+}
+
+.categories {
+    display: flex;
+    justify-content: space-between;
+}
+
+.category {
+    text-align: center;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Center the content vertically */
+    width: 100%; /* Set the width of the boxes */
+    height: 141px; /* Set the height of the boxes */
+    border: 1px solid #ddd;
+    transition: border-bottom 0.3s;
+}
+
+.selected {
+    border-bottom: 5px solid #006CFF;
+}
+
+.category img {
+    display: block;
+    width: 50px; /* Set a fixed width */
+    height: 50px; /* Set a fixed height */
+    object-fit: contain; /* Maintain aspect ratio */
+}
+
+.category span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    color: #549CFF;
+    font-family: Inter;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+}
+
+.category_active {
+    color: #0066ff;
+    border-bottom: 5px solid #0066ff;
+}
+
+.catergory_content {
+    display: flex;
+}
+
+.info {
+    width: 100%;
+}
+
+.date {
+    text-align: right;
+    color: #999;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
