@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styles from './Interest_news.module.css';
 import Menubar from "../components/menubar";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,11 +23,13 @@ export default function Interest_news() {
         { id: 10, text: '엔터테인먼트', checked: false },
         { id: 11, text: '인물', checked: false },
     ]);
-    
+
     const reduxInfo = useSelector((state) => state.userInfo);
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
+    const cancelTokenSources = useRef([]);
 
     useEffect(() => {
         if (!reduxInfo.userName) {
@@ -42,7 +44,16 @@ export default function Interest_news() {
         setKeywords(updatedKeywords);
     }, [reduxInfo, navigate]);
 
-   const handleCheckboxChange = async (id) => {
+    const cancelPreviousRequests = () => {
+        cancelTokenSources.current.forEach(source => {
+            source.cancel("Operation canceled due to new request.");
+        });
+        cancelTokenSources.current = [];
+    };
+
+    const handleCheckboxChange = async (id) => {
+        cancelPreviousRequests();
+
         const updatedKeywords = keywords.map((keyword) =>
             keyword.id === id ? { ...keyword, checked: !keyword.checked } : keyword
         );
@@ -74,18 +85,26 @@ export default function Interest_news() {
 
         useEffect(() => {
             if (matchingType) {
+                const source = axios.CancelToken.source();
+                cancelTokenSources.current.push(source);
+
                 setLoading(true);
                 if (process.env.REACT_APP_CRAWLING_API_URL === "http://localhost:8000") {
                     keywordsApi.get(`/news/`, {
                         params: {
                             crawl_type: matchingType.en
                         },
+                        cancelToken: source.token,
                         withCredentials: true
                     }).then(res => {
                         setNews(res.data.data || []);
                         setLoading(false);
                     }).catch(err => {
-                        console.log(err);
+                        if (axios.isCancel(err)) {
+                            console.log('Request canceled', err.message);
+                        } else {
+                            console.log(err);
+                        }
                         setLoading(false);
                     });
                 } else {
@@ -93,17 +112,22 @@ export default function Interest_news() {
                         params: {
                             crawl_type: matchingType.en
                         },
+                        cancelToken: source.token,
                         withCredentials: true
                     }).then(res => {
                         setNews(res.data.data || []);
                         setLoading(false);
                     }).catch(err => {
-                        console.log(err);
+                        if (axios.isCancel(err)) {
+                            console.log('Request canceled', err.message);
+                        } else {
+                            console.log(err);
+                        }
                         setLoading(false);
                     });
                 }
             }
-        }, [matchingType]);
+        }, []);
 
         return (
             <div>
