@@ -90,6 +90,8 @@ https://konlpy.org/ko/stable/install/
 ### 실행
 8000번 port 사용
 - 로컬 실행
+
+crawling/Django 위치에서 실행
 ```bash
 python3 manage.py runserver
 ```
