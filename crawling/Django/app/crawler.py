@@ -25,8 +25,7 @@ class KeywordList(list) : #키워드를 저장하기 위해 제작된 클래스
 
 
 def crawling(crawl_type) :
-    #경향신문 O, 내일신문 O , 동아일보 O, 문화일보 O, 서울신문 O, 서울일보 O, 세계일보 X (크롤링 허용 X), 
-    #아시아투데이 O, 조선일보, 중앙일보 O , 한겨레 (크롤링 허용 X), 한국일보 (크롤링 허용 X)
+    #경향신문 O, 내일신문 O , 동아일보 O, 문화일보 O, 서울신문 O, 서울일보 O, 아시아투데이 O, 조선일보, 중앙일보 O
 
     data_bundle = []
     keywords = KeywordList()# 키워드 목록
@@ -68,8 +67,8 @@ def selectCrawlType(crawl_type) :
     else : # 잘못된 타입인 경우
         return {
             'crawl_type' : crawl_type,
-            'title' : "no data",
-            'content' : "no data"
+            'data' : "no data",
+            'frequency' : "no data"
         }
 
 def increaseCount(count) : # 최대 크롤링 가능 갯수를 초과하지 않아 추가 크롤링이 가능한지 여부를 반환하는 함수 
