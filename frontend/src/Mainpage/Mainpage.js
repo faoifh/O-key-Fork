@@ -175,9 +175,9 @@ export default function Mainpage() {
                             {label: '국제', icon: 'icon-international.png'},
                             {label: '스포츠', icon: 'icon-sports.png'},
                             {label: 'IT/과학', icon: 'icon-science.png'},
-                            {label: '교육', icon: 'icon-science.png'},
-                            {label: '엔터테인먼트', icon: 'icon-science.png'},
-                            {label: '인물', icon: 'icon-science.png'},
+                            {label: '교육', icon: 'icon-edu.png'},
+                            {label: '엔터테인먼트', icon: 'icon-enter.png'},
+                            {label: '인물', icon: 'icon-people.png'},
                         ].map((category) => (
                             <div
                                 key={category.label}
