@@ -45,7 +45,7 @@ git clone https://github.com/O-key-Do-key/O-key.git
  sudo npm run build
 ```
 
-##Backend
+## Backend
 ### 사용 기술
 - Nestjs
 - MariaDB
@@ -66,7 +66,7 @@ git clone https://github.com/O-key-Do-key/O-key.git
 ```
 
 
-##Crawling
+## Crawling
 ### 사용 기술
 - Python
 - Django
