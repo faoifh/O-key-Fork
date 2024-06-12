@@ -9,8 +9,10 @@ from collections import Counter
 crawl_limit = 50 # 최대 크롤링 가능 개수
 komoran = Komoran()
 
-# bad keyword 목록
-bad_keyword_list = []
+# bad keyword 목록 불러오기
+file_path = os.path.join(os.path.dirname(__file__), 'bad_keywords.json')
+with open(file_path, 'r', encoding='utf-8') as json_file :
+    bad_keyword_list = json.load(json_file)
 
 # 크롤링 타입 리스트
 CRAWL_TYPES = ['economy', 'politics', 'society', 'culture', 'science', 'world', 'sport', 'enter', 'people', 'education'] 
@@ -31,11 +33,6 @@ def crawling(crawl_type) :
     crawl_count = [0]# 정수 데이터를 call-by-reference 방식으로 전달하기 위하여 리스트로 선언
 
     threads = [] # 쓰레드 리스트
-
-    #bad keyword list 불러오기
-    file_path = os.path.join(os.path.dirname(__file__), 'bad_keywords.json')
-    with open(file_path, 'r', encoding='utf-8') as json_file :
-        bad_keyword_list = json.load(json_file)
 
     #각 크롤링 함수들을 쓰레드에 지정
     threads.append(threading.Thread(target = crawl_khan, args=(crawl_type, data_bundle, crawl_count, keywords)))#경향신문
@@ -119,7 +116,7 @@ def crawl_khan(crawl_type, return_data, count, keywords) : # 경향신문 크롤
         
         # 제목과 내용 배열에 삽입
         data_bundle.append({"company":"경향신문", "url" : news_url, "title": title, "content": content})
-    
+        
     return_data.extend(data_bundle)
 
 
@@ -552,5 +549,3 @@ def crawl_daum(crawl_type, return_data, count, keywords) : # 다음 뉴스 크�
 
     return_data.extend(data_bundle)
 '''
-
-selectCrawlType('economy')
