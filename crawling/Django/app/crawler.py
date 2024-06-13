@@ -1,6 +1,6 @@
-import requests
+import aiohttp
+import asyncio
 import json
-import threading
 import os
 from bs4 import BeautifulSoup
 from konlpy.tag import Komoran
@@ -23,47 +23,61 @@ class KeywordList(list) : #키워드를 저장하기 위해 제작된 클래스
         if key not in bad_keyword_list : # bad keyword에 포함되지 않은 경우에만 추가
             self.append(key)
 
+async def fetch(session, url, params, retry_count = 3):
+    for attempt in range(retry_count):
+        try:
+            async with session.get(url, params=params, headers={'User-Agent': 'Mozilla/5.0'}, timeout=aiohttp.ClientTimeout(total=30)) as response:
+                response.raise_for_status()  # Raise an exception for HTTP errors
+                return await response.text()
+        except (aiohttp.ClientError, aiohttp.ClientOSError) as e:
+            if attempt < retry_count - 1:
+                print(f"Request failed ({e}), retrying...")
+                await asyncio.sleep(1)  # wait before retrying
+            else:
+                print(f"Request failed after {retry_count} attempts: {e}")
+                raise
 
-def crawling(crawl_type) :
-    #경향신문 O, 내일신문 O , 동아일보 O, 문화일보 O, 서울신문 O, 서울일보 O, 아시아투데이 O, 조선일보, 중앙일보 O
+async def crawling(crawl_type) :
+    async with aiohttp.ClientSession() as session :
+        #경향신문 O, 내일신문 O , 동아일보 O, 문화일보 O, 서울신문 O, 서울일보 O, 아시아투데이 O, 조선일보, 중앙일보 O
 
-    data_bundle = []
-    keywords = KeywordList()# 키워드 목록
-    crawl_count = [0]# 정수 데이터를 call-by-reference 방식으로 전달하기 위하여 리스트로 선언
+        data_bundle = []
+        keywords = KeywordList()# 키워드 목록
+        crawl_count = [0]# 정수 데이터를 call-by-reference 방식으로 전달하기 위하여 리스트로 선언
 
-    threads = [] # 쓰레드 리스트
+        threads = [] # 쓰레드 리스트
 
-    #각 크롤링 함수들을 쓰레드에 지정
-    threads.append(threading.Thread(target = crawl_khan, args=(crawl_type, data_bundle, crawl_count, keywords)))#경향신문
-    threads.append(threading.Thread(target = crawl_naeil, args=(crawl_type, data_bundle, crawl_count, keywords)))#내일신문
-    threads.append(threading.Thread(target = crawl_donga, args=(crawl_type, data_bundle, crawl_count, keywords)))#동아일보
-    threads.append(threading.Thread(target = crawl_munhwa, args=(crawl_type, data_bundle, crawl_count, keywords)))#문화일보
-    threads.append(threading.Thread(target = crawl_seoulNews, args=(crawl_type, data_bundle, crawl_count, keywords)))#서울신문
-    threads.append(threading.Thread(target = crawl_seoulIlbo, args=(crawl_type, data_bundle, crawl_count, keywords)))#서울일보
-    threads.append(threading.Thread(target = crawl_asia, args=(crawl_type, data_bundle, crawl_count, keywords)))#아시아투데이
-    threads.append(threading.Thread(target = crawl_joongang, args=(crawl_type, data_bundle, crawl_count, keywords)))#중앙일보
+        #문화일보 임시 비활성화, 디코딩 해야함
 
-    #쓰레드를 통해 크롤링을 동시에 실시
-    for t in threads : t.start()
+        #각 크롤링 함수들을 쓰레드에 지정
+        tasks = [
+            crawl_khan(crawl_type, session, data_bundle, crawl_count, keywords),
+            crawl_naeil(crawl_type, session, data_bundle, crawl_count, keywords),
+            crawl_donga(crawl_type, session, data_bundle, crawl_count, keywords),
+            #crawl_munhwa(crawl_type, session, data_bundle, crawl_count, keywords),# EUC-KR 변환 필요
+            crawl_seoulNews(crawl_type, session, data_bundle, crawl_count, keywords),
+            crawl_seoulIlbo(crawl_type, session, data_bundle, crawl_count, keywords),
+            crawl_asia(crawl_type, session, data_bundle, crawl_count, keywords),
+            crawl_joongang(crawl_type, session, data_bundle, crawl_count, keywords),
+        ]
+        
+        await asyncio.gather(*tasks)
 
-    #모든 쓰레드가 종료될 때 까지 대기
-    for t in threads : t.join()
+        counter = Counter(keywords) # 모든 키워드의 언급 빈도를 계산
 
-    counter = Counter(keywords) # 모든 키워드의 언급 빈도를 계산
+        #JSON 형식으로 데이터 변환 및 타입 태그 추가
+        data = {
+            'crawl_type' : crawl_type,
+            'data' : data_bundle,
+            'frequency' : counter.most_common(100)
+        }
 
-    #JSON 형식으로 데이터 변환 및 타입 태그 추가
-    data = {
-        'crawl_type' : crawl_type,
-        'data' : data_bundle,
-        'frequency' : counter.most_common(100)
-    }
-    
-    return data
+        return data
 
 def selectCrawlType(crawl_type) :
     #crawl_type 에 따라 조건문 수행
     if(crawl_type in CRAWL_TYPES ) : # 리스트에 포함된 타입인 경우에만 수행
-        return crawling(crawl_type)
+        return asyncio.run(crawling(crawl_type))
     else : # 잘못된 타입인 경우
         return {
             'crawl_type' : crawl_type,
@@ -79,18 +93,19 @@ def increaseCount(count) : # 최대 크롤링 가능 갯수를 초과하지 않�
 
 
 
-def crawl_khan(crawl_type, return_data, count, keywords) : # 경향신문 크롤링, 경향 신문에는 사진과 제목만 존재하고 본문이 없는 경우도 있음.
+async def crawl_khan(crawl_type, session, return_data, count, keywords) : # 경향신문 크롤링, 경향 신문에는 사진과 제목만 존재하고 본문이 없는 경우도 있음.
     TYPETAG = {'politics' : 'politics', 
                'economy' : 'economy', 'society' : 'national', 'culture' : 'culture', 'science' : 'science/science-general/articles', 'world' : 'world', 'sport' : 'sports'} # 타입에 따른 주소 태그의 딕셔너리
     
     if not (crawl_type in TYPETAG) :
         return
     
-    header = {'User-agent' : 'Mozila/2.0'}
+    header = {'User-Agent': 'Mozilla/5.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
     
-    res = requests.get("https://www.khan.co.kr/"+str(TYPETAG[crawl_type]), headers=header)
-    html = res.text
+    url = f"https://www.khan.co.kr/{TYPETAG[crawl_type]}"
+    html = await fetch(session, url, params={})
+
     soup = BeautifulSoup(html, 'html.parser')
     newsBox = soup.find(class_='main-list-wrap')
     news = newsBox.select('.line_clamp2')
@@ -100,9 +115,11 @@ def crawl_khan(crawl_type, return_data, count, keywords) : # 경향신문 크롤
         if not increaseCount(count) : break # 최대 기사 갯수 도달시 반복종료
         
         news_url = link.attrs['href'] # 각 뉴스 기사의 url 획득
-        subRes = requests.get(news_url, headers=header) # 해당 기사의 html 획득
-        html = subRes.text
-        subSoup = BeautifulSoup(html, 'html.parser')
+
+        sub_html = await fetch(session, news_url, params={}) # 해당 기사의 html 획득
+        subSoup = BeautifulSoup(sub_html, 'html.parser')
+
+
         article_text = subSoup.select('#articleBody') #기사 본문 지정
         title = link.attrs['title']#기사 제목 저장
 
@@ -115,11 +132,11 @@ def crawl_khan(crawl_type, return_data, count, keywords) : # 경향신문 크롤
         
         # 제목과 내용 배열에 삽입
         data_bundle.append({"company":"경향신문", "url" : news_url, "title": title, "content": content})
-        
+
     return_data.extend(data_bundle)
 
 
-def crawl_naeil(crawl_type, return_data, count, keywords) : # 내일신문 크롤링
+async def crawl_naeil(crawl_type,session, return_data, count, keywords) : # 내일신문 크롤링
     TYPETAG = {'politics' : 'politics',
                'economy' : 'economy', 'society' : 'policy', 'science' : 'industry', 'world' : 'diplomacy'} # 타입에 따른 주소 태그의 딕셔너리
 
@@ -129,8 +146,9 @@ def crawl_naeil(crawl_type, return_data, count, keywords) : # 내일신문 크�
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
     
-    res = requests.get("https://www.naeil.com/"+str(TYPETAG[crawl_type]), headers=header)
-    html = res.text
+    url = f"https://www.naeil.com/{TYPETAG[crawl_type]}"
+    html = await fetch(session, url, params={})
+
     soup = BeautifulSoup(html, 'html.parser')
     newsBox = soup.find(class_='story-list')
     news = newsBox.find_all(class_ = 'headline')
@@ -140,9 +158,9 @@ def crawl_naeil(crawl_type, return_data, count, keywords) : # 내일신문 크�
         if not increaseCount(count) : break # 최대 기사 갯수 도달시 반복종료
         
         news_url = "https://www.naeil.com" + link.find('a').attrs['href']
-        subRes = requests.get(news_url, headers=header)
-        html = subRes.text
-        subSoup = BeautifulSoup(html, 'html.parser')
+        sub_html = await fetch(session, news_url, params={}) # 해당 기사의 html 획득
+        subSoup = BeautifulSoup(sub_html, 'html.parser')
+
         article_text = subSoup.select('.article-view')
         title = link.text.strip()
 
@@ -158,7 +176,7 @@ def crawl_naeil(crawl_type, return_data, count, keywords) : # 내일신문 크�
 
     return_data.extend(data_bundle)
 
-def crawl_donga(crawl_type, return_data, count, keywords) : # 동아일보 크롤링
+async def crawl_donga(crawl_type, session, return_data, count, keywords) : # 동아일보 크롤링
     TYPETAG = {'politics' : 'Politics',
                'economy' : 'Economy', 'society' : 'Society', 'culture' : 'Culture', 'world' : 'Inter', 'sport' : 'Sports',
                'enter' : 'Entertainment'} # 타입에 따른 주소 태그의 딕셔너리
@@ -169,8 +187,9 @@ def crawl_donga(crawl_type, return_data, count, keywords) : # 동아일보 크�
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
     
-    res = requests.get("https://www.donga.com/news/"+str(TYPETAG[crawl_type]), headers=header)
-    html = res.text
+    url = f"https://www.donga.com/news/{TYPETAG[crawl_type]}"
+    html = await fetch(session, url, params={})
+
     soup = BeautifulSoup(html, 'html.parser')
     newsBox = soup.find(class_='row_list')
     news = newsBox.select('.tit')
@@ -180,9 +199,10 @@ def crawl_donga(crawl_type, return_data, count, keywords) : # 동아일보 크�
         if not increaseCount(count) : break # 최대 기사 갯수 도달시 반복종료
         
         news_url = link.find('a').attrs['href']
-        subRes = requests.get(news_url, headers=header)
-        html = subRes.text
-        subSoup = BeautifulSoup(html, 'html.parser')
+
+        sub_html = await fetch(session, news_url, params={}) # 해당 기사의 html 획득
+        subSoup = BeautifulSoup(sub_html, 'html.parser')
+
         article_text = subSoup.select('.news_view')
         title = link.text.strip()
 
@@ -198,7 +218,7 @@ def crawl_donga(crawl_type, return_data, count, keywords) : # 동아일보 크�
 
     return_data.extend(data_bundle)
 
-def crawl_joongang(crawl_type, return_data, count, keywords) : # 중앙일보 크롤링
+async def crawl_joongang(crawl_type,session, return_data, count, keywords) : # 중앙일보 크롤링
     TYPETAG = {'politics' : 'politics', 
                'economy' : 'money', 'society' : 'society', 'culture' : 'culture', 'world' : 'world', 'sport' : 'sports'} # 타입에 따른 주소 태그의 딕셔너리
 
@@ -207,9 +227,9 @@ def crawl_joongang(crawl_type, return_data, count, keywords) : # 중앙일보 �
 
     header = {'User-agent' : 'Mozila/2.0'}  
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
-    
-    res = requests.get("https://www.joongang.co.kr/"+str(TYPETAG[crawl_type]), headers=header)
-    html = res.text
+
+    url = f"https://www.joongang.co.kr/{TYPETAG[crawl_type]}"
+    html = await fetch(session, url, params={})
     soup = BeautifulSoup(html, 'html.parser')
     newsBox = soup.find(class_='story_list')
     news = newsBox.select('.headline') 
@@ -219,9 +239,10 @@ def crawl_joongang(crawl_type, return_data, count, keywords) : # 중앙일보 �
         if not increaseCount(count) : break # 최대 기사 갯수 도달시 반복종료
         
         news_url = link.find('a').attrs['href']
-        subRes = requests.get(news_url, headers=header)
-        html = subRes.text
-        subSoup = BeautifulSoup(html, 'html.parser')
+
+        sub_html = await fetch(session, news_url, params={}) # 해당 기사의 html 획득
+        subSoup = BeautifulSoup(sub_html, 'html.parser')
+  
         article_text = subSoup.select('#article_body')
         title = link.text.strip()
 
@@ -237,7 +258,7 @@ def crawl_joongang(crawl_type, return_data, count, keywords) : # 중앙일보 �
 
     return_data.extend(data_bundle)
 
-def crawl_munhwa(crawl_type, return_data, count, keywords) : # 문화일보 크롤링
+async def crawl_munhwa(crawl_type, session, return_data, count, keywords) : # 문화일보 크롤링
     TYPETAG = {'politics' : 'politics',
                'economy' : 'economy', 'society' : 'society', 'culture' : 'culture', 'world' : 'international',
                'sport' : 'sports', 'enter' : 'ent', 'people':'people'} # 타입에 따른 주소 태그의 딕셔너리
@@ -248,8 +269,9 @@ def crawl_munhwa(crawl_type, return_data, count, keywords) : # 문화일보 크�
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
     
-    res = requests.get("https://www.munhwa.com/news/section_main.html?sec="+str(TYPETAG[crawl_type])+"&class=30", headers=header)
-    html = res.content.decode('euc-kr','replace') # 인코딩을 euc-kr로 바꿈
+    url = f"https://www.munhwa.com/news/section_main.html?sec={TYPETAG[crawl_type]}&class=30"
+    html = await fetch(session, url, params={})
+
     soup = BeautifulSoup(html, 'html.parser')
     newsBox = soup.find(class_='news_list')
     news = newsBox.select('a.title')
@@ -259,9 +281,8 @@ def crawl_munhwa(crawl_type, return_data, count, keywords) : # 문화일보 크�
         if not increaseCount(count) : break # 최대 기사 갯수 도달시 반복종료
         
         news_url = "https:" + link.attrs['href']
-        subRes = requests.get(news_url, headers=header)
-        html = subRes.content.decode('euc-kr','replace') # 인코딩을 euc-kr로 바꿈
-        subSoup = BeautifulSoup(html, 'html.parser')
+        sub_html = await fetch(session, news_url, params={}) # 해당 기사의 html 획득
+        subSoup = BeautifulSoup(sub_html, 'html.parser')
         article_text = subSoup.select('#News_content')
         title = link.text.strip()
 
@@ -278,7 +299,7 @@ def crawl_munhwa(crawl_type, return_data, count, keywords) : # 문화일보 크�
     return_data.extend(data_bundle)
     
 
-def crawl_seoulNews(crawl_type, return_data, count, keywords) : # 서울신문 크롤링
+async def crawl_seoulNews(crawl_type, session, return_data, count, keywords) : # 서울신문 크롤링
     TYPETAG = {'politics' : 'politics',
                 'economy' : 'economy', 'society' : 'society', 'culture' : 'life', 'world' : 'international', 'sport' : 'sport',
                 'people' : 'peoples'} # 타입에 따른 주소 태그의 딕셔너리
@@ -289,8 +310,9 @@ def crawl_seoulNews(crawl_type, return_data, count, keywords) : # 서울신문 �
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
     
-    res = requests.get("https://www.seoul.co.kr/newsList/"+str(TYPETAG[crawl_type]), headers=header)
-    html = res.content.decode('utf-8','replace') # 인코딩을 utf-8로 바꿈
+    url = f"https://www.seoul.co.kr/newsList/{TYPETAG[crawl_type]}"
+    html = await fetch(session, url, params={})
+
     soup = BeautifulSoup(html, 'html.parser')
     newsBox = soup.find(class_='pageListWrap')
     news = newsBox.select('.articleTitle')
@@ -300,9 +322,9 @@ def crawl_seoulNews(crawl_type, return_data, count, keywords) : # 서울신문 �
         if not increaseCount(count) : break # 최대 기사 갯수 도달시 반복종료
         
         news_url = "https://www.seoul.co.kr/" + link.find('a').attrs['href']
-        subRes = requests.get(news_url, headers=header)
-        html = subRes.content.decode('utf-8','replace') # 인코딩을 utf-8로 바꿈
-        subSoup = BeautifulSoup(html, 'html.parser')
+        sub_html = await fetch(session, news_url, params={}) # 해당 기사의 html 획득
+        subSoup = BeautifulSoup(sub_html, 'html.parser')
+        
         article_text = subSoup.select('.viewContent')
         title = link.find('h2')
         title = title.text.strip()
@@ -322,7 +344,7 @@ def crawl_seoulNews(crawl_type, return_data, count, keywords) : # 서울신문 �
 
     return_data.extend(data_bundle)
 
-def crawl_seoulIlbo(crawl_type, return_data, count, keywords) : # 서울일보 크롤링
+async def crawl_seoulIlbo(crawl_type, session, return_data, count, keywords) : # 서울일보 크롤링
     TYPETAG = {'politics' : '8',
                 'economy' : '9', 'society' : '10', 'culture' : '11', 'enter' : '12', 'world' : '14',
                 'education' : '20'} # 타입에 따른 주소 태그의 딕셔너리
@@ -333,8 +355,9 @@ def crawl_seoulIlbo(crawl_type, return_data, count, keywords) : # 서울일보 �
     header = {'User-agent' : 'Mozila/2.0'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
     
-    res = requests.get("https://www.seoulilbo.com/news/articleList.html?sc_section_code=S1N"+str(TYPETAG[crawl_type]), headers=header)
-    html = res.text
+    url = f"https://www.seoulilbo.com/news/articleList.html?sc_section_code=S1N{TYPETAG[crawl_type]}"
+    html = await fetch(session, url, params={})
+
     soup = BeautifulSoup(html, 'html.parser')
     newsBox = soup.find(class_='section-body')
     news = newsBox.select('h4', attrs={"class": "titles"})
@@ -344,9 +367,10 @@ def crawl_seoulIlbo(crawl_type, return_data, count, keywords) : # 서울일보 �
         if not increaseCount(count) : break # 최대 기사 갯수 도달시 반복종료
         
         news_url = "https://www.seoulilbo.com/"+link.find('a').attrs['href']
-        subRes = requests.get(news_url, headers=header)
-        html = subRes.text
-        subSoup = BeautifulSoup(html, 'html.parser')
+       
+        sub_html = await fetch(session, news_url, params={}) # 해당 기사의 html 획득
+        subSoup = BeautifulSoup(sub_html, 'html.parser')
+        
         article_text = subSoup.select('#article-view-content-div')
         title = link.text.strip()
 
@@ -366,7 +390,7 @@ def crawl_seoulIlbo(crawl_type, return_data, count, keywords) : # 서울일보 �
     
     return_data.extend(data_bundle)
 
-def crawl_asia(crawl_type, return_data, count, keywords) : # 아시아투데이 크롤링
+async def crawl_asia(crawl_type, session, return_data, count, keywords) : # 아시아투데이 크롤링
     TYPETAG = {'politics' : '2',
                 'society' : '3', 'economy' : '4', 'world' : '6', 'culture' : '7&d2=5', 'sport' : '7&d2=7',
                 'enter' : '7&d2=2'} # 타입에 따른 주소 태그의 딕셔너리
@@ -376,11 +400,12 @@ def crawl_asia(crawl_type, return_data, count, keywords) : # 아시아투데이 
     if not (crawl_type in TYPETAG) :
         return
 
-    header = {'User-agent' : 'Mozila/2.0'}
+    header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
     data_bundle=[] # 뉴스 정보를 담고 있는 JSON들의 배열
     
-    res = requests.get("https://www.asiatoday.co.kr/kn_section.php?d1="+str(TYPETAG[crawl_type]), headers=header)
-    html = res.text
+    url = f"https://www.asiatoday.co.kr/kn_section.php?d1={TYPETAG[crawl_type]}"
+    html = await fetch(session, url, params={})
+
     soup = BeautifulSoup(html, 'html.parser')
     newsBox = soup.find(class_='sub_section_news_box')
     news = newsBox.select('dl>dd>a')
@@ -390,9 +415,10 @@ def crawl_asia(crawl_type, return_data, count, keywords) : # 아시아투데이 
         if not increaseCount(count) : break # 최대 기사 갯수 도달시 반복종료
         
         news_url = "https://www.asiatoday.co.kr" + link.attrs['href']
-        subRes = requests.get(news_url, headers=header)
-        html = subRes.text
-        subSoup = BeautifulSoup(html, 'html.parser')
+        
+        sub_html = await fetch(session, news_url, params={}) # 해당 기사의 html 획득
+        subSoup = BeautifulSoup(sub_html, 'html.parser')
+        
         article_text = subSoup.select('.news_bm')
         
         if(crawl_type in SPECIALTAG) :
